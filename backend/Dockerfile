@@ -6,11 +6,13 @@ COPY package*.json ./
 
 RUN npm install
 
+RUN npm install -g ts-node-dev
+
 COPY . .
 
 
 
-CMD [ "node", "server.js"]
+CMD ["npm", "run", "dev"]
 
 
 
