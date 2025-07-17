@@ -1,4 +1,10 @@
 
+export interface ArrayUser{
+   	 [UserOwnerDto]		
+
+
+}
+
 
 export interface UserOwnerDto{
 	readonly id:string;
