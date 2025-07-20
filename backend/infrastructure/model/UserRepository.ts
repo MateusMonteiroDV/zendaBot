@@ -10,7 +10,7 @@ class UserRepository implements IUserRepository{
 
 
 
-				const users = await test.query('select * from user_owner')
+				const users = await test.query('select * from public.user_owner')
 
 
 				return users;
@@ -38,7 +38,7 @@ class UserRepository implements IUserRepository{
 
 
 
-const user = new UserRepository();
+const user: UserRepository = new UserRepository();
 const teste = user.test()
 
 
