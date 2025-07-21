@@ -3,17 +3,15 @@ import pool from '../db'
 import {UserOwnerDto, ArrayUser} from '../../aplicattion/dto/UserDto'
 
 class UserRepository implements IUserRepository{
-		public async  test(){
+		public async test(){
 			try{
 
 				const test =  await pool.connect();
+				const users = await test.query('select * from user_owner')
 
+				test.release()
 
-
-				const users = await test.query('select * from public.user_owner')
-
-
-				return users;
+				return users.rows
 			
 			}	catch(err){
 				console.log(err);
@@ -38,10 +36,17 @@ class UserRepository implements IUserRepository{
 
 
 
-const user: UserRepository = new UserRepository();
-const teste = user.test()
+const userRepository = new UserRepository();
+
+userRepository.test()
+.then(users =>{
+	console.log( JSON.stringify(users))
 
 
-console.log(teste);
+}).catch(err=>{
+		console.log(err)
+
+})
+
 
 

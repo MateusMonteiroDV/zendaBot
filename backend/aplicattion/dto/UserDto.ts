@@ -1,9 +1,5 @@
 
-export interface ArrayUser{
-   	 [UserOwnerDto]		
-
-
-}
+export type ArrayUser = UserOwnerDto[];
 
 
 export interface UserOwnerDto{
