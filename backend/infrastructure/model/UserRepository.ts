@@ -1,6 +1,8 @@
 import {IUserRepository} from '../../repository';
 import pool from '../db'
 import {UserOwnerDto, ArrayUser} from '../../aplicattion/dto/UserDto'
+ímport {uuid} from 'uuid'
+
 
 class UserRepository implements IUserRepository{
 		public async test(){
@@ -23,7 +25,18 @@ class UserRepository implements IUserRepository{
 
 
 		public async save( user:UserOwnerDto){
-				
+			const client = await pool.connect();
+			const query = {
+				text: 'insert into user_owner(id, user_name, email, user_password) values($1, $2, $3, $4)',
+				values: [user.id, user.name, user.email, user.password];
+
+			}
+			 
+			 await client.query(query);
+			
+
+
+			client.realase(); 
 
 
 
@@ -36,17 +49,21 @@ class UserRepository implements IUserRepository{
 
 
 
-const userRepository = new UserRepository();
+const userRepository:UserRepository  = new UserRepository();
 
-userRepository.test()
-.then(users =>{
-	console.log( JSON.stringify(users))
+
+
+
+userRepository.save().
+then(data =>{
+	console.log('it goes right' + data)
 
 
 }).catch(err=>{
-		console.log(err)
+	console.log(err)
 
 })
+
 
 
 
