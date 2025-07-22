@@ -1,10 +1,10 @@
-import {IUserRepository} from '../../repository';
+import {IUserRepository} from '../../repository/User';
 import pool from '../db'
 import {UserOwnerDto, ArrayUser} from '../../aplicattion/dto/UserDto'
-ímport {uuid} from 'uuid'
 
 
-class UserRepository implements IUserRepository{
+
+export class UserRepository implements IUserRepository{
 		public async test(){
 			try{
 
@@ -28,7 +28,7 @@ class UserRepository implements IUserRepository{
 			const client = await pool.connect();
 			const query = {
 				text: 'insert into user_owner(id, user_name, email, user_password) values($1, $2, $3, $4)',
-				values: [user.id, user.name, user.email, user.password];
+				values: [user.id, user.name, user.email, user.password]
 
 			}
 			 
@@ -36,7 +36,7 @@ class UserRepository implements IUserRepository{
 			
 
 
-			client.realase(); 
+			client.release(); 
 
 
 
@@ -49,20 +49,6 @@ class UserRepository implements IUserRepository{
 
 
 
-const userRepository:UserRepository  = new UserRepository();
-
-
-
-
-userRepository.save().
-then(data =>{
-	console.log('it goes right' + data)
-
-
-}).catch(err=>{
-	console.log(err)
-
-})
 
 
 
