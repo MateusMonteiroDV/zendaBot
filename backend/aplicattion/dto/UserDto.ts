@@ -1,5 +1,6 @@
 
-export type ArrayUser = UserOwnerDto[];
+
+
 
 
 export interface UserOwnerDto{
@@ -14,8 +15,7 @@ export interface UserOwnerDto{
 }
 
 
-export interface CreateUserOwnerDto {
-		readonly id:string;
+export interface UserOwnerRegisterInputDto {
 		name:string;
 		email:string;
 		password:string;
@@ -24,11 +24,17 @@ export interface CreateUserOwnerDto {
 
 }
 
-export interface UserOwnerResponseDto{
-        name:string;
-        phoneNumber:string;
-
+export interface UserOwnerRegiserOutputDto {
+	token: string;
 
 }
 
-i
+export interface UserOwnerResponseDto{
+    id:string
+
+}
+
+
+
+
+

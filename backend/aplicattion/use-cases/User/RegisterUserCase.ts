@@ -4,17 +4,22 @@ import {IRegisterUserCase} from '../../../repository';
 import {UserOwnerRegisterInputDto, UserOwnerDto } from '../../dto/UserDto'
 import {User} from '../../../domain/entities/User'
 import {TokenJWT} from '../../../infrastructure/ItokenJWT'
+import {UserOwnerRegistrOuputDto} from '../../dto/UserDto'
 
 
 
 
 export class RegisterUserCase implements IRegisterUserCase{
 	private userRepository: IUserRepository
+	private tokeJwt:TokenJWT
 
-	constructor(userRepository:IUserRepository){
+
+	constructor(userRepository:IUserRepository, tokeJwt:TokenJWT ){
 		this.userRepository = userRepoistory; 
+		this.tokenJWT = tokenJWT
 	}
 
+	
 	public async execute(user: UserOwnerRegisterInputDto ){
 		const existEmail = await userRepository.findByEmail(user.email);
 		
@@ -22,39 +27,21 @@ export class RegisterUserCase implements IRegisterUserCase{
 			return 'email already exists'
 		}
 
-		const user_owner = await User.validEmail(user);
-
-		try{
+		try {
 			
-			const user_owner = await User.validEmail(user);
+			const user_owner:User = await User.validEmail(user);
 											
 			await userRepository.save(user_owner);
 
-			const tokenJWT: TokenJWT = new TokenJWT(process.env.JWT_SECRET_KEY, process.env.JWT_EXSPIRES_TIME);
-			const token:string = tokenJWT.encode(user.id);
+			
+			const token: = tokenJWT.encode(user.id);
 
 			return token
+			
+			} catch(err){
+				console.log(err)
 
-
-
-
-		
-
-
-		}catch(err){
-			 console.log(err)
-
-			 return err
+			 	return err
 		}
-
-
-
-
-
-
-
-
-}
-
-
+	}
 }
