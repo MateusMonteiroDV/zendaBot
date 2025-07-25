@@ -1,6 +1,5 @@
 import {UserOwnerDto} from '../../aplicattion/dto/UserDto' 
 
-
 class User {
 	constructor(
 		public readonly id:string,
@@ -9,21 +8,21 @@ class User {
 		public password: string
 	)	{}
 
-	public static ValidEmail(user_owner:UserOwnerDto): User{
+	public static ValidEmail(user_owner:UserOwnerDto, id: string): User{
 		 
-		 if(!user_owner.email.include('@') || !user_owner.email.include('gmail')){
+		 if(!user_owner.email.include('@') || !user_owner.email.include('gmail.com')){
 					throw new error('You must include @ and gmail')	
 
 
 			}
 		
-			return new User(user_owner.id, 
+			return new User(
+					id,
 					user_owner.name, 
 					user_owner.email,
 					user_owner.password,
 					
-
-					)
+)
 
 	}
 
