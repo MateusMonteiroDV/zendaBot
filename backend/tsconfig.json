@@ -21,6 +21,16 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx"
-  }
+  },
  
+
+   "include": [
+    "./**/*.ts",
+    "test/**/*.ts",
+   
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }
