@@ -3,10 +3,10 @@ require('dotenv').config({path: '../../../.env'})
 import {IRegisterUserCase} from '../../../repository/IRegisterUserCase';
 import {UserOwnerRegisterInputDto, UserOwnerDto } from '../../dto/UserDto'
 import {User} from '../../../domain/entities/User'
-import {IUserRepository} from '../../../repository/UserRepository'
+import {IUserRepository} from '../../../repository/IUserRepository'
 import {ItokenJWT} from '../../../repository/ItokenJWT'
 
-import {UserOwnerRegistrOuputDto} from '../../dto/UserDto'
+
 
 import {v4 as generate_uuid} from 'uuid';
 
@@ -14,39 +14,46 @@ import {v4 as generate_uuid} from 'uuid';
 
 
 export class RegisterUserCase implements IRegisterUserCase{
-	private userRepository: IUserRepository
-	private tokenJwt:ItokenJWT
+	
+	constructor(	
+		private userRepository: IUserRepository,
+		private tokenJWT:ItokenJWT
 
 
-	constructor(userRepository:IUserRepository , tokenJwt:ItokenJWT ){
-		this.userRepository = userRepository, 
-		this.tokenJwt = tokenJwt
-	}
+		){}
 
 	
 	public async execute(user: UserOwnerRegisterInputDto ){
-		const existEmail = await this.userRepository.findByEmail(user.email);
 		
-		if (existEmail){
-			return 'email already exists'
-		}
+
 
 		try {
 			
+			if(await this.userRepository.findByEmail(user.email)){;
+				throw new Error('Email already exists')		
+			}
+
+
 			const id_user  = await generate_uuid();
-			const user_owner:User = await User.validEmail(user,id_user );
-											
-			await userRepository.save(user_owner);
+			const isValid:boolean = await User.validEmail(user.email);
+			if(!isValid){
+				throw new Error('Email doenst include @ or gmail.com')
+			}
 
 			
-			const token:string = tokenJWT.encode(id_user);
+			const user_owner:User = new User(id_user, user.name, user.email, user.password);
+						
+			await this.userRepository.save(user_owner);
+			
+			
+			const token:string = await this.tokenJWT.encode(id_user);
 
 			return token
 			
 			} catch(err){
 				console.log(err)
 
-			 	return err
+ 				throw err;
 		}
 	}
 }
