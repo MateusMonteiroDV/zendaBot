@@ -3,9 +3,12 @@ require('dotenv').config({path:'../../.env'})
 import {RegisterUserCase} from '../../aplicattion/use-cases/User/RegisterUserCase'
 import {TokenJWT} from '../../../infrastructure/ItokenJWT'
 import {UserRepository} from '../../../infrastructure/model/UserRepository'
-import { UserOwnerRegisterInputDto} from '../../aplicattion/dto/UserDto'
+import { UserOwnerRegisterInputDto,  UserOwnerRegiserOutputDto } from '../../aplicattion/dto/UserDto'
+
+
 
 const mockUserRepository =  {
+	findByEmail: jest.fn(),
 	test: jest.fn(),
 	save: jest.fn(),
 
@@ -23,13 +26,14 @@ describe('RegisterUserCase', ()=>{
 	
 	let user: UserOwnerRegisterInputDto;
 	let registerUserCase: RegisterUserCase;
-
+	let mockToken: UserOwnerRegiserOutputDto;
 	 
 	
 	beforeEach(()=>{
 		
 		mockUserRepository.save.mockClear()
 		mockTokenJWT.encode.mockClear()
+
 
 		 user = {
 			name : 'beltrano',
@@ -49,6 +53,7 @@ describe('RegisterUserCase', ()=>{
 	
 
 	test('Register user and return token ', async ()=>{
+		 	mockUserRepository.findByEmail.mockResolvedValue(false);
 		 	mockUserRepository.save.mockResolvedValue(undefined)
 		 	mockTokenJWT.encode.mockReturnValue('mock-jwt-token')
 
@@ -59,7 +64,7 @@ describe('RegisterUserCase', ()=>{
 		 	expect(mockUserRepository.save).toHaveBeenCalledTimes(1)
 		 	expect(mockUserRepository.save).toHaveBeenCalledWith(
 		 		
-		 		expect.ObjectContaining({
+		 		expect.objectContaining({
 		 				name: user.name,
 		 				email: user.email,
 		 				password:  user.password 
@@ -77,10 +82,11 @@ describe('RegisterUserCase', ()=>{
 	})
 
 	test('Should throw a error if email already exists', async () =>{
-
-		await expect(registerUserCase.execute(user)).rejects.toThrow('User email already exist');
+		mockUserRepository.findByEmail.mockResolvedValue(true);	
+		
+		await expect(registerUserCase.execute(user)).rejects.toThrow('Email already exist');
 		expect(mockUserRepository.save).not.toHaveBeenCalled();
- 		expect(mockTokenJWT.generateToken).not.toHaveBeenCalled();
+ 		expect(mockTokenJWT.encode).not.toHaveBeenCalled();
 
 
 
