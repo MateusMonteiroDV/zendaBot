@@ -1,60 +1,59 @@
 require('dotenv').config({path: '../../../.env'})
 
-import {IRegisterUserCase} from '../../../repository';
+import {IRegisterUserCase} from '../../../repository/IRegisterUserCase';
 import {UserOwnerRegisterInputDto, UserOwnerDto } from '../../dto/UserDto'
 import {User} from '../../../domain/entities/User'
-import {TokenJWT} from '../../../infrastructure/ItokenJWT'
+import {IUserRepository} from '../../../repository/IUserRepository'
+import {ItokenJWT} from '../../../repository/ItokenJWT'
+
+
+
+import {v4 as generate_uuid} from 'uuid';
 
 
 
 
 export class RegisterUserCase implements IRegisterUserCase{
-	private userRepository: IUserRepository
+	
+	constructor(	
+		private userRepository: IUserRepository,
+		private tokenJWT:ItokenJWT
 
-	constructor(userRepository:IUserRepository){
-		this.userRepository = userRepoistory; 
-	}
 
+		){}
+
+	
 	public async execute(user: UserOwnerRegisterInputDto ){
-		const existEmail = await userRepository.findByEmail(user.email);
 		
-		if (existEmail){
-			return 'email already exists'
-		}
 
-		const user_owner = await User.validEmail(user);
 
-		try{
+		try {
 			
-			const user_owner = await User.validEmail(user);
-											
-			await userRepository.save(user_owner);
+			if(await this.userRepository.findByEmail(user.email)){;
+				throw new Error('Email already exists')		
+			}
 
-			const tokenJWT: TokenJWT = new TokenJWT(process.env.JWT_SECRET_KEY, process.env.JWT_EXSPIRES_TIME);
-			const token:string = tokenJWT.encode(user.id);
+
+			const id_user  = await generate_uuid();
+			const isValid:boolean = await User.validEmail(user.email);
+			if(!isValid){
+				throw new Error('Email doenst include @ or gmail.com')
+			}
+
+			
+			const user_owner:User = new User(id_user, user.name, user.email, user.password);
+						
+			await this.userRepository.save(user_owner);
+			
+			
+			const token:string = await this.tokenJWT.encode(id_user);
 
 			return token
+			
+			} catch(err){
+				console.log(err)
 
-
-
-
-		
-
-
-		}catch(err){
-			 console.log(err)
-
-			 return err
+ 				throw err;
 		}
-
-
-
-
-
-
-
-
-}
-
-
+	}
 }

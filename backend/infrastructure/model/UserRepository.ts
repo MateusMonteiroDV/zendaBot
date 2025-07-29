@@ -1,6 +1,8 @@
-import {IUserRepository} from '../../repository/User';
+import {IUserRepository} from '../../repository/IUserRepository';
 import pool from '../db'
-import {UserOwnerDto, ArrayUser} from '../../aplicattion/dto/UserDto'
+import {UserOwnerDto, ArrayUser, UserOwnerEmail, UserOnwerDtoBool} from '../../aplicattion/dto/UserDto'
+
+import {v4 as generate_uuid} from 'uuid'
 
 
 
@@ -22,6 +24,38 @@ export class UserRepository implements IUserRepository{
 
 
 		}
+
+		public async findByEmail(email:UserOwnerEmail) {
+						
+			try{	
+				const client = await pool.connect();
+					
+					const query = {
+						text: 'select email from user_owner where email = $1'
+						values: [email]
+
+					}
+
+
+				const emailFind = await client.query(query);
+
+				client.release()	
+
+
+			  	return email.rows.length > 0  
+				} catch(err){
+
+					console.log(err);
+					
+					throw new Error('Error to find email' + err)
+
+
+
+			} 	
+		
+		} 
+
+
 
 
 		public async save( user:UserOwnerDto){
