@@ -52,11 +52,7 @@ describe('RegisterUserCase', ()=>{
 		mockUserRepository.save.mockClear()
 		mockTokenJWT.encode.mockClear()
 	
-			
-		 
-
-
-		 user = {
+		user = {
 			name : 'beltrano',
 			email : 'beltrano@gmail.com',
 			password : '1234'
