@@ -1,9 +1,24 @@
-require('dotenv').config({path:'../../.env'})
 
+// mock bcrypt before import to get the module
+const mockGenSalt = jest.fn();
+const mockHash = jest.fn();
+
+jest.mock('bcrypt', () => ({
+  genSalt: mockGenSalt,
+  hash: mockHash
+}));
+
+
+require('dotenv').config({path:'../../.env'})
 import {RegisterUserCase} from '../../aplicattion/use-cases/User/RegisterUserCase'
 import {TokenJWT} from '../../../infrastructure/ItokenJWT'
 import {UserRepository} from '../../../infrastructure/model/UserRepository'
 import { UserOwnerRegisterInputDto,  UserOwnerRegiserOutputDto } from '../../aplicattion/dto/UserDto'
+
+
+
+import bcrypt from 'bcrypt' 
+
 
 
 
@@ -18,6 +33,9 @@ const mockTokenJWT = {
 	encode: jest.fn(),
 	decode:jest.fn()
 }
+  
+
+
 
 
 
@@ -33,6 +51,9 @@ describe('RegisterUserCase', ()=>{
 		
 		mockUserRepository.save.mockClear()
 		mockTokenJWT.encode.mockClear()
+	
+			
+		 
 
 
 		 user = {
@@ -55,7 +76,14 @@ describe('RegisterUserCase', ()=>{
 	test('Register user and return token ', async ()=>{
 		 	mockUserRepository.findByEmail.mockResolvedValue(false);
 		 	mockUserRepository.save.mockResolvedValue(undefined)
-		 	mockTokenJWT.encode.mockReturnValue('mock-jwt-token')
+		 	mockTokenJWT.encode.mockResolvedValue('mock-jwt-token');
+		
+
+			mockGenSalt.mockResolvedValue('testSalt')
+			mockHash.mockResolvedValue('hash1234') 	
+		 	
+		 
+		 	
 
 		 	const result = await registerUserCase.execute(user)
 		 	
@@ -67,11 +95,14 @@ describe('RegisterUserCase', ()=>{
 		 		expect.objectContaining({
 		 				name: user.name,
 		 				email: user.email,
-		 				password:  user.password 
+		 				password: 'hash1234'
 
 		 		})
 
 		 	)
+		 	
+		 	expect(mockGenSalt).toHaveBeenCalledWith(10)
+		 	expect(mockHash).toHaveBeenCalledWith(user.password, 'testSalt' )
 		 	expect(mockTokenJWT.encode).toHaveBeenCalledTimes(1);
 		 	expect(result).toBe('mock-jwt-token')
 
