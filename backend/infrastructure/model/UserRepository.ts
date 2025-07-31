@@ -42,7 +42,7 @@ export class UserRepository implements IUserRepository{
 				client.release()	
 
 
-			  	return email.rows.length > 0  
+			  	return email.rows.length > 0 ?  
 				} catch(err){
 
 					console.log(err);
