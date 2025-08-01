@@ -1,3 +1,4 @@
+import {Query} from 'pg'
 import {IUserRepository} from '../../repository/IUserRepository';
 import pool from '../db'
 import {UserOwnerDto, ArrayUser, UserOwnerEmail, UserOnwerDtoBool} from '../../aplicattion/dto/UserDto'
@@ -34,15 +35,15 @@ export class UserRepository implements IUserRepository{
 						text: 'select email from user_owner where email = $1'
 						values: [email]
 
-					}
+			}
 
 
-				const email = await client.query(query);
-
+				const email:Query = await client.query(query);
+				
 				client.release()	
 
 
-			  	return email.rows[0]
+			  	return email[0]
 			} catch(err){
 
 					console.log(err);

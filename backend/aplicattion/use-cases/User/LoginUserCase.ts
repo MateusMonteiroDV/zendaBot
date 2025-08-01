@@ -16,7 +16,7 @@ export class LoginUserCase implements ILoginUserCase{
 	  	try{	
 			const user_owner:string =  await this.userRepository.findByEmail(user.email);
 
-			if(!user){
+			if(!user_owner){
 
 				throw new Error('Email doenst exists');
 			}	
@@ -34,6 +34,7 @@ export class LoginUserCase implements ILoginUserCase{
 
 			return token
 		}catch(err){
+			console.log(err);
 			return err
 		}	
 	}
