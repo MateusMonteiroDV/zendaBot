@@ -23,7 +23,7 @@ export class RegisterUserCase implements IRegisterUserCase{
 		){}
 
 	
-	public async execute(user: UserOwnerRegisterInputDto ){
+	 async execute(user: UserOwnerRegisterInputDto ){
 		
 
 
