@@ -13,7 +13,7 @@ require('dotenv').config({path:'../../.env'})
 import {RegisterUserCase} from '../../aplicattion/use-cases/User/RegisterUserCase'
 import {TokenJWT} from '../../../infrastructure/ItokenJWT'
 import {UserRepository} from '../../../infrastructure/model/UserRepository'
-import { UserOwnerRegisterInputDto,  UserOwnerRegiserOutputDto } from '../../aplicattion/dto/UserDto'
+import { UserOwnerDto, UserOwnerRegisterInputDto,  UserOwnerRegiserOutputDto } from '../../aplicattion/dto/UserDto'
 
 
 
@@ -42,9 +42,10 @@ const mockTokenJWT = {
 
 describe('RegisterUserCase', ()=>{
 	
+	let existsUser:UserOwnerDto;
 	let user: UserOwnerRegisterInputDto;
 	let registerUserCase: RegisterUserCase;
-	let mockToken: UserOwnerRegiserOutputDto;
+
 	 
 	
 	beforeEach(()=>{
@@ -52,6 +53,14 @@ describe('RegisterUserCase', ()=>{
 		mockUserRepository.save.mockClear()
 		mockTokenJWT.encode.mockClear()
 	
+		existsUser = {
+				id: '45615161615161611651',
+				name: 'teste',
+				email: 'teste@gmail.com',
+				password: '1561561'
+
+		}
+
 		user = {
 			name : 'beltrano',
 			email : 'beltrano@gmail.com',
@@ -70,7 +79,7 @@ describe('RegisterUserCase', ()=>{
 	
 
 	test('Register user and return token ', async ()=>{
-		 	mockUserRepository.findByEmail.mockResolvedValue(false);
+		 	mockUserRepository.findByEmail.mockResolvedValue(null);
 		 	mockUserRepository.save.mockResolvedValue(undefined)
 		 	mockTokenJWT.encode.mockResolvedValue('mock-jwt-token');
 		
@@ -109,7 +118,7 @@ describe('RegisterUserCase', ()=>{
 	})
 
 	test('Should throw a error if email already exists', async () =>{
-		mockUserRepository.findByEmail.mockResolvedValue(true);	
+		mockUserRepository.findByEmail.mockResolvedValue(existsUser);	
 		
 		await expect(registerUserCase.execute(user)).rejects.toThrow('Email already exist');
 		expect(mockUserRepository.save).not.toHaveBeenCalled();
