@@ -37,13 +37,13 @@ export class UserRepository implements IUserRepository{
 					}
 
 
-				const emailFind = await client.query(query);
+				const email = await client.query(query);
 
 				client.release()	
 
 
-			  	return email.rows.length > 0 ?  
-				} catch(err){
+			  	return email.rows[0]
+			} catch(err){
 
 					console.log(err);
 					

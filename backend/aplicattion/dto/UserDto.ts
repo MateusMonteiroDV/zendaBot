@@ -10,6 +10,7 @@ export interface UserOwnerDtoEmail {
 
 
 export interface UserOwnerDto{
+	id:string;
 	name:string;
 	email:string;
 	password:string;
@@ -28,6 +29,16 @@ export interface UserOwnerRegisterInputDto {
 
 
 }
+
+export interface UserOwnerLoginInputDto {
+		
+		email:string;
+		password:string;
+		
+
+
+}
+
 
 export type UserOwnerRegiserOutputDto = string
 
