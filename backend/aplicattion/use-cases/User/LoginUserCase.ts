@@ -1,7 +1,7 @@
-import {IUserRepository} from '../../../repository'
+import {IUserRepository} from '../../../repository/IUserRepository'
 import {ItokenJWT} from '../../../repository/ItokenJWT'
 import bcrypt from 'bcrypt'
-import { UserOwnerLoginInputDto} from '../../../aplicattion/dto/UserDto';
+import { UserOwnerLoginInputDto, UserOwnerDto} from '../../../aplicattion/dto/UserDto';
 
 
 
@@ -14,14 +14,14 @@ export class LoginUserCase implements ILoginUserCase{
 
 	async execute(user:UserOwnerLoginInputDto ){
 	  	try{	
-			const user_owner:string =  await this.userRepository.findByEmail(user.email);
+			const user_owner:UserOwnerDto | null =  await this.userRepository.findByEmail(user.email);
 
 			if(!user_owner){
 
-				throw new Error('Email doenst exists');
+				throw new Error('Email doesnt exists');
 			}	
 
-			const passwordIsValid:boolean = bcrypt.compare(user.password, user_owner.password);
+			const passwordIsValid:boolean = await bcrypt.compare(user.password, user_owner.password);
 
 			if(!passwordIsValid){
 				throw new Error('Password is wrong');
@@ -32,10 +32,10 @@ export class LoginUserCase implements ILoginUserCase{
 			return token;
 
 
-			return token
-		}catch(err){
+			
+		} catch(err){
 			console.log(err);
-			return err
+			 throw err
 		}	
 	}
 

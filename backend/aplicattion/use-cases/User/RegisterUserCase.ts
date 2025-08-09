@@ -58,6 +58,5 @@ export class RegisterUserCase implements IRegisterUserCase{
 				console.log(err)
 
  				throw err;
-		}
 	}
 }
