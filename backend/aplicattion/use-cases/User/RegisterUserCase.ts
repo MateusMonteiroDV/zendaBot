@@ -59,4 +59,5 @@ export class RegisterUserCase implements IRegisterUserCase{
 
  				throw err;
 	}
+ }
 }

@@ -1,13 +1,14 @@
 
 import {ArrayUser} from '../aplicattion/dto/UserDto'
+import {UserOwnerDto} from '../aplicattion/dto/UserDto'
 
 
 
 export interface IUserRepository {
 		
-		public findByEmail(): Promisse<boolean>
-		public test(): Promisse<ArrayUser:null>;
-		public save(): Promisse<void>;
+		 findByEmail(): Promise<UserOwnerDto | null>
+		 test(): Promise<ArrayUser | null>;
+		 save(user:UserOwnerDto): Promise<void>;
 					
 
 

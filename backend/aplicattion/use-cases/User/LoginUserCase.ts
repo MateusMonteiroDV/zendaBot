@@ -1,4 +1,5 @@
 import {IUserRepository} from '../../../repository/IUserRepository'
+import {IUserRepository} from '../../../repository/ILoginUserCase'
 import {ItokenJWT} from '../../../repository/ItokenJWT'
 import bcrypt from 'bcrypt'
 import { UserOwnerLoginInputDto, UserOwnerDto} from '../../../aplicattion/dto/UserDto';

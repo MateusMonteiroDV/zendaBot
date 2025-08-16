@@ -32,7 +32,7 @@ export class UserRepository implements IUserRepository{
 				const client = await pool.connect();
 					
 					const query = {
-						text: 'select email from user_owner where email = $1'
+						text: 'select email from user_owner where email = $1',
 						values: [email]
 
 			}
