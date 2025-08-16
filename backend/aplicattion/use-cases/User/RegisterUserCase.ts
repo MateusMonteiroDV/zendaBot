@@ -57,7 +57,7 @@ export class RegisterUserCase implements IUserRegisteUserUseCase{
 			} catch(err){
 				console.log(err)
 
- 				throw err;
+ 				return null
 	}
  }
 }

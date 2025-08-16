@@ -1,4 +1,6 @@
-export class WhatsAppApiAdapter implements IWhatsAppApiAdapter {
+import {IWhatsApiAdapter} from '../repository/IWhatsApiAdapter'
+
+export class WhatsApiAdapter implements IWhatsApiAdapter {
 	async send(){}
 
 }

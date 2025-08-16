@@ -14,12 +14,12 @@ export class LoginUserCase {
             if (!passwordIsValid) {
                 throw new Error('Password is wrong');
             }
-            const token = await this.tokenJWT.encode(user_owner.id);
+            const token = await this.tokenJWT.encode({ id: user_owner.id });
             return token;
         }
         catch (err) {
             console.log(err);
-            throw err;
+            return null;
         }
     }
 }

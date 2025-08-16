@@ -1,3 +1,3 @@
-export class ChatGptApiAdapter {
+export class ChatApiAdapter {
     async reply() { }
 }

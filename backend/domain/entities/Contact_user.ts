@@ -10,7 +10,7 @@ export class Contact_user {
 		public phone_number:string
 ){}
 
-	public static validPhoneNumber(owner_contact: dtoContactOwner):Boolean{
+	public static validPhoneNumber(owner_contact: ContactOwnerDto):Boolean{
 		if(owner_contact.phone_number.length < 10 || owner_contact.phone_number.length > 10 ){
 			throw new Error(' Number is wrong')
 }		

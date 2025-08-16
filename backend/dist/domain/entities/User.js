@@ -5,10 +5,11 @@ export class User {
         this.email = email;
         this.password = password;
     }
-    static validEmail(email) {
+    static validEmail(dto) {
+        const { email } = dto;
         if (!email.includes('@') || !email.includes('gmail.com')) {
-            return false;
+            return Promise.resolve(false);
         }
-        return true;
+        return Promise.resolve(true);
     }
 }

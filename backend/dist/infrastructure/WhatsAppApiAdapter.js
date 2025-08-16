@@ -1,3 +1,3 @@
-export class WhatsAppApiAdapter {
+export class WhatsApiAdapter {
     async send() { }
 }

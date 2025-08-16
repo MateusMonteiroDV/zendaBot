@@ -25,7 +25,7 @@ export class TokenJWT implements ItokenJWT {
 	 	
 	 	console.log(err)
 	 	
-	 	return err;
+	 	return null;
 	 }		
 
 	}	
