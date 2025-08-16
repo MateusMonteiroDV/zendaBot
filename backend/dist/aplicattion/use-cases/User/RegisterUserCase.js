@@ -1,7 +1,7 @@
 require('dotenv').config({ path: '../../../.env' });
 import { User } from '../../../domain/entities/User';
 import { v4 as generate_uuid } from 'uuid';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 export class RegisterUserCase {
     constructor(userRepository, tokenJWT) {
         this.userRepository = userRepository;
@@ -9,8 +9,7 @@ export class RegisterUserCase {
     }
     async execute(user) {
         try {
-            if (await this.userRepository.findByEmail(user.email)) {
-                ;
+            if (await this.userRepository.findByEmail({ user, : .email })) {
                 throw new Error('Email already exists');
             }
             const saltRound = 10;

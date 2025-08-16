@@ -1,10 +1,13 @@
 
+export interface UserDtoToken{
+	id:string
+};
 
-export interface UserOwnerDtoEmail {
+
+export interface UserOwnerDtoEmail{
 	email:string
 
-
-}
+} 
 
 
 

@@ -1,9 +1,9 @@
-
+import {UserDtoToken} from '../aplicattion/dto/UserDto'
 
 
 export interface ItokenJWT {
-	public encode():Promise<string>
-	public decode(): Promise<void>
+	 encode(payload:UserDtoToken):Promise<string>
+	 decode(): Promise<void>
 
 
 

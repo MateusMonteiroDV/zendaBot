@@ -1,17 +1,5 @@
 import pool from '../db';
 export class UserRepository {
-    async test() {
-        try {
-            const test = await pool.connect();
-            const users = await test.query('select * from user_owner');
-            test.release();
-            return users.rows;
-        }
-        catch (err) {
-            console.log(err);
-            throw err;
-        }
-    }
     async findByEmail(email) {
         try {
             const client = await pool.connect();
@@ -19,9 +7,9 @@ export class UserRepository {
                 text: 'select email from user_owner where email = $1',
                 values: [email]
             };
-            const email = await client.query(query);
+            const result = await client.query(query);
             client.release();
-            return email[0];
+            return result.rows[0];
         }
         catch (err) {
             console.log(err);

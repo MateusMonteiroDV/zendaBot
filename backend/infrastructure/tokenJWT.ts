@@ -2,7 +2,8 @@ require('dotenv').config('../.env')
 
 import {UserDtoToken} from '../aplicattion/dto/UserDto' 
 import {ItokenJWT} from '../repository/ItokenJWT'
-import {jsonwebtoken as jwt} from 'jsonwebtoken'
+import * as jwt from 'jsonwebtoken'; 
+import {Secret,SignOptions} from 'jsonwebtoken'
 
 
 
@@ -14,9 +15,9 @@ export class TokenJWT implements ItokenJWT {
 		private expires: string
 	){}
 
-	 public async encode(payload:UserDtoToken){
+	  async encode(payload:UserDtoToken){
 		try{
-			const token  =  await jwt.sign(payload,this.secret, {expiresIn : this.expires} );
+			const token:string  =  jwt.sign(payload,this.secret as Secret, {expiresIn: this.expires } as SignOptions);
 
 
 			return token;

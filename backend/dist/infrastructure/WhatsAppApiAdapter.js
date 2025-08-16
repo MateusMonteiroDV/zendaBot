@@ -1,1 +1,3 @@
-"use strict";
+export class WhatsAppApiAdapter {
+    async send() { }
+}

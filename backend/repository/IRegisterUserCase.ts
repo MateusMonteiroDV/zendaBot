@@ -1,6 +1,5 @@
-
-
+import {UserOwnerRegisterInputDto, UserOwnerDto } from '../aplicattion/dto/UserDto'
 export interface IUserRegisteUserUseCase{
-	 public execute(): Promisse<string>;
+	  execute(user:UserOwnerRegisterInputDto): Promise<string>;
 
 }

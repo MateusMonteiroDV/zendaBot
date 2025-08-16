@@ -1,7 +1,7 @@
 import {IUserRepository} from '../../../repository/IUserRepository'
-import {IUserRepository} from '../../../repository/ILoginUserCase'
+import {ILoginUserCase} from '../../../repository/ILoginUserCase'
 import {ItokenJWT} from '../../../repository/ItokenJWT'
-import bcrypt from 'bcrypt'
+import * as bcrypt from 'bcrypt'
 import { UserOwnerLoginInputDto, UserOwnerDto} from '../../../aplicattion/dto/UserDto';
 
 
@@ -15,7 +15,7 @@ export class LoginUserCase implements ILoginUserCase{
 
 	async execute(user:UserOwnerLoginInputDto ){
 	  	try{	
-			const user_owner:UserOwnerDto | null =  await this.userRepository.findByEmail(user.email);
+			const user_owner:UserOwnerDto | null =  await this.userRepository.findByEmail({email:user.email});
 
 			if(!user_owner){
 
@@ -28,7 +28,7 @@ export class LoginUserCase implements ILoginUserCase{
 				throw new Error('Password is wrong');
 			}	
 
-			const token:string = this.tokenJWT.encode(user_owner.id);
+			const token = await this.tokenJWT.encode({id:user_owner.id});
 
 			return token;
 

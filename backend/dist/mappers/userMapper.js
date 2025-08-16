@@ -1,4 +1,6 @@
 export class UserMapper {
-    static toResponse(user) {
+    toDomain() {
+    }
+    toResponse() {
     }
 }

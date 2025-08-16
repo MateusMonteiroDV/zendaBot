@@ -8,7 +8,7 @@ jest.mock('bcrypt', () => ({
 import bcrypt from 'bcrypt'
 
 
-import {UserOwnerLoginInputDt, UserOwnerDto} from '../../aplicattion/dto/UserDto'
+import {UserOwnerLoginInputDto, UserOwnerDto} from '../../aplicattion/dto/UserDto'
 import {LoginUserCase} from '../../aplicattion/use-cases/User/LoginUserCase'
 
 

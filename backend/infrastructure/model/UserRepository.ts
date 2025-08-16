@@ -1,32 +1,16 @@
-import {Query} from 'pg'
+import {QueryResult} from 'pg'
 import {IUserRepository} from '../../repository/IUserRepository';
 import pool from '../db'
-import {UserOwnerDto, ArrayUser, UserOwnerEmail, UserOnwerDtoBool} from '../../aplicattion/dto/UserDto'
+import {UserOwnerDto,UserOwnerDtoEmail} from '../../aplicattion/dto/UserDto'
 
 import {v4 as generate_uuid} from 'uuid'
 
 
 
 export class UserRepository implements IUserRepository{
-		public async test(){
-			try{
+		
 
-				const test =  await pool.connect();
-				const users = await test.query('select * from user_owner')
-
-				test.release()
-
-				return users.rows
-			
-			}	catch(err){
-				console.log(err);
-				throw err
-			}
-
-
-		}
-
-		public async findByEmail(email:UserOwnerEmail) {
+		public async findByEmail(email:UserOwnerDtoEmail) {
 						
 			try{	
 				const client = await pool.connect();
@@ -38,12 +22,12 @@ export class UserRepository implements IUserRepository{
 			}
 
 
-				const email:Query = await client.query(query);
+				const result:QueryResult<any> = await client.query(query);
 				
 				client.release()	
 
 
-			  	return email[0]
+			  	return result.rows[0]
 			} catch(err){
 
 					console.log(err);

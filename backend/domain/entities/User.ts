@@ -1,4 +1,4 @@
-import {UserOwnerDto} from '../../aplicattion/dto/UserDto' 
+import {UserOwnerDtoEmail} from '../../aplicattion/dto/UserDto' 
 
 export class User {
 	constructor(
@@ -8,16 +8,16 @@ export class User {
 		public password: string
 	)	{}
 
-	public static validEmail(email:UserOwnerDtoEmail): Promisse<boolean>{
-		 
+	public static validEmail(dto:UserOwnerDtoEmail): Promise<boolean>{
+		const {email} = dto;			 
 		 if(!email.includes('@') || !email.includes('gmail.com')){
-					return false
+				return Promise.resolve(false)
 
 			
 			}
 		
 					
-			return true					
+			return Promise.resolve(true)					
 
 
 	}

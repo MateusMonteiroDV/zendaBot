@@ -1,14 +1,14 @@
 
-import {UserResponseDto} from '../dto/UserDto'
+import {UserOwnerResponseDto, UserOwnerDto} from '../aplicattion/dto/UserDto'
+import {IUserMapper} from '../repository/IUserMapper'
 
-
-export class UserMapper{
+export class UserMapper implements IUserMapper{
 		
-		public static toDomain():{
-s
+		  toDomain(){
+
 		}
 		
-		public static toResponse(user:UserDto):UserResponseDto{
+		  toResponse(){
 
 
 			

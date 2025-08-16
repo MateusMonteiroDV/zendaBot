@@ -11,8 +11,8 @@ jest.mock('bcrypt', () => ({
 
 require('dotenv').config({path:'../../.env'})
 import {RegisterUserCase} from '../../aplicattion/use-cases/User/RegisterUserCase'
-import {TokenJWT} from '../../../infrastructure/ItokenJWT'
-import {UserRepository} from '../../../infrastructure/model/UserRepository'
+import {TokenJWT} from '../../infrastructure/tokenJWT'
+import {UserRepository} from '../../infrastructure/model/UserRepository'
 import { UserOwnerDto, UserOwnerRegisterInputDto,  UserOwnerRegiserOutputDto } from '../../aplicattion/dto/UserDto'
 
 

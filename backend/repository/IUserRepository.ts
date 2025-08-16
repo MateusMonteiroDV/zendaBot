@@ -1,13 +1,11 @@
 
-import {ArrayUser} from '../aplicattion/dto/UserDto'
-import {UserOwnerDto} from '../aplicattion/dto/UserDto'
+import {UserOwnerDto, UserOwnerDtoEmail} from '../aplicattion/dto/UserDto'
 
 
 
 export interface IUserRepository {
 		
-		 findByEmail(): Promise<UserOwnerDto | null>
-		 test(): Promise<ArrayUser | null>;
+		 findByEmail(email:UserOwnerDtoEmail): Promise<UserOwnerDto | null>
 		 save(user:UserOwnerDto): Promise<void>;
 					
 

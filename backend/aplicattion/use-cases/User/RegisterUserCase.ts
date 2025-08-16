@@ -1,6 +1,6 @@
 require('dotenv').config({path: '../../../.env'})
 
-import {IRegisterUserCase} from '../../../repository/IRegisterUserCase';
+import {IUserRegisteUserUseCase} from '../../../repository/IRegisterUserCase';
 import {UserOwnerRegisterInputDto, UserOwnerDto } from '../../dto/UserDto'
 import {User} from '../../../domain/entities/User'
 import {IUserRepository} from '../../../repository/IUserRepository'
@@ -9,11 +9,11 @@ import {ItokenJWT} from '../../../repository/ItokenJWT'
 
 
 import {v4 as generate_uuid} from 'uuid';
-import bcrypt from 'bcrypt'
+import * as bcrypt from 'bcrypt'
 
 
 
-export class RegisterUserCase implements IRegisterUserCase{
+export class RegisterUserCase implements IUserRegisteUserUseCase{
 	
 	constructor(	
 		private userRepository: IUserRepository,
@@ -29,7 +29,7 @@ export class RegisterUserCase implements IRegisterUserCase{
 
 		try {
 			
-			if(await this.userRepository.findByEmail(user.email)){;
+			if(await this.userRepository.findByEmail({email:user.email})){
 				throw new Error('Email already exists')		
 			}
 			const saltRound:number= 10;
@@ -38,7 +38,7 @@ export class RegisterUserCase implements IRegisterUserCase{
 
 		
 			const id_user:string  = await generate_uuid();
-			const isValid:boolean = await User.validEmail(user.email);
+			const isValid:boolean = await User.validEmail({email:user.email});
 			
 			if(!isValid){
 				throw new Error('Email doenst include @ or gmail.com')
@@ -50,7 +50,7 @@ export class RegisterUserCase implements IRegisterUserCase{
 			await this.userRepository.save(user_owner);
 			
 			
-			const token:string = await this.tokenJWT.encode(id_user);
+			const token = await this.tokenJWT.encode({id:id_user});
 
 			return token
 			
