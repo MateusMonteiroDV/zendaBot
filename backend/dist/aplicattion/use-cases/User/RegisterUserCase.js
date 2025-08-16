@@ -1,5 +1,6 @@
-require('dotenv').config({ path: '../../../.env' });
-import { User } from '../../../domain/entities/User';
+import dotenv from 'dotenv';
+dotenv.config({ path: '../../../.env' });
+import { User } from '../../../domain/entities/User.js';
 import { v4 as generate_uuid } from 'uuid';
 import * as bcrypt from 'bcrypt';
 export class RegisterUserCase {

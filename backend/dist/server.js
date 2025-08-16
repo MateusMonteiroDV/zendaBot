@@ -3,6 +3,7 @@ dotenv.config({ path: './.env' });
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import userRouter from './router/user/index.js';
 const app = express();
 const corsOptions = {
     origin: process.env.NODE_ENV === 'production'
@@ -17,9 +18,7 @@ app.options('*', cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.get('/', (req, res) => {
-    res.end('Hello world');
-});
+app.use('/api', userRouter);
 app.listen(5000, () => {
     console.log(' Listening on port 5000');
 });

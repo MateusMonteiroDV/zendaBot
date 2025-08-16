@@ -1,7 +1,7 @@
 import {QueryResult} from 'pg'
-import {IUserRepository} from '../../repository/IUserRepository';
-import pool from '../db'
-import {UserOwnerDto,UserOwnerDtoEmail} from '../../aplicattion/dto/UserDto'
+import {IUserRepository} from '../../repository/IUserRepository.js';
+import pool from '../db.js'
+import {UserOwnerDto,UserOwnerDtoEmail} from '../../aplicattion/dto/UserDto.js'
 
 import {v4 as generate_uuid} from 'uuid'
 

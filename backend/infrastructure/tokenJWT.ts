@@ -1,4 +1,7 @@
-require('dotenv').config('../.env')
+import dotenv from 'dotenv'
+dotenv.config({path:'../.env'})
+
+
 
 import {UserDtoToken} from '../aplicattion/dto/UserDto' 
 import {ItokenJWT} from '../repository/ItokenJWT'

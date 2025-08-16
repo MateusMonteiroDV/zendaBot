@@ -5,6 +5,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
+import userRouter from './router/user/index.js';
 const app = express();
 
 const corsOptions = {
@@ -24,9 +25,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/', (req:Request, res:Response) => {
-   res.end('Hello world');
-});
+app.use('/api', userRouter);
 
 app.listen(5000, () => {
   console.log(' Listening on port 5000');

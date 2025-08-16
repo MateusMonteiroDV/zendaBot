@@ -1,8 +1,8 @@
-import {IUserRepository} from '../../../repository/IUserRepository'
-import {ILoginUserCase} from '../../../repository/ILoginUserCase'
-import {ItokenJWT} from '../../../repository/ItokenJWT'
+import {IUserRepository} from '../../../repository/IUserRepository.js'
+import {ILoginUserCase} from '../../../repository/ILoginUserCase.js'
+import {ItokenJWT} from '../../../repository/ItokenJWT.js'
 import * as bcrypt from 'bcrypt'
-import { UserOwnerLoginInputDto, UserOwnerDto} from '../../../aplicattion/dto/UserDto';
+import { UserOwnerLoginInputDto, UserOwnerDto} from '../../../aplicattion/dto/UserDto.js';
 
 
 

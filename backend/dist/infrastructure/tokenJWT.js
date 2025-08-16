@@ -1,4 +1,5 @@
-require('dotenv').config('../.env');
+import dotenv from 'dotenv';
+dotenv.config({ path: '../.env' });
 import * as jwt from 'jsonwebtoken';
 export class TokenJWT {
     constructor(secret, expires) {

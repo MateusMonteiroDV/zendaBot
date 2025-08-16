@@ -1,8 +1,10 @@
-require('dotenv').config({path: '../../../.env'})
+import dotenv from 'dotenv'
+dotenv.config({path: '../../../.env'})
+
 
 import {IUserRegisteUserUseCase} from '../../../repository/IRegisterUserCase';
 import {UserOwnerRegisterInputDto, UserOwnerDto } from '../../dto/UserDto'
-import {User} from '../../../domain/entities/User'
+import {User} from '../../../domain/entities/User.js'
 import {IUserRepository} from '../../../repository/IUserRepository'
 import {ItokenJWT} from '../../../repository/ItokenJWT'
 
