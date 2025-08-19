@@ -1,4 +1,7 @@
+export interface ChatMessageDto{
+    message:string;
 
+}
 export interface UserDtoToken{
 	id:string
 };
