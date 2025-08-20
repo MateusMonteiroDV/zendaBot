@@ -1,25 +1,31 @@
-export interface ChatMessageDto{
-    message:string;
+export interface WhatSendMessageDto {
+  to: string;
+  text: string
 
 }
-export interface UserDtoToken{
-	id:string
+
+export interface ChatMessageDto {
+  message: string;
+
+}
+export interface UserDtoToken {
+  id: string
 };
 
 
-export interface UserOwnerDtoEmail{
-	email:string
+export interface UserOwnerDtoEmail {
+  email: string
 
-} 
-
-
+}
 
 
-export interface UserOwnerDto{
-	id:string;
-	name:string;
-	email:string;
-	password:string;
+
+
+export interface UserOwnerDto {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
 
 
 
@@ -28,19 +34,19 @@ export interface UserOwnerDto{
 
 
 export interface UserOwnerRegisterInputDto {
-		name:string;
-		email:string;
-		password:string;
-		
+  name: string;
+  email: string;
+  password: string;
+
 
 
 }
 
 export interface UserOwnerLoginInputDto {
-		
-		email:string;
-		password:string;
-		
+
+  email: string;
+  password: string;
+
 
 
 }
@@ -48,8 +54,8 @@ export interface UserOwnerLoginInputDto {
 
 export type UserOwnerRegiserOutputDto = string
 
-export interface UserOwnerResponseDto{
-    id:string
+export interface UserOwnerResponseDto {
+  id: string
 
 }
 
