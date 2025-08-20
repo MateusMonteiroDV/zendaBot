@@ -1,6 +1,7 @@
-import {IWhatsApiAdapter} from '../repository/IWhatsApiAdapter'
+import { IWhatsApiAdapter } from '../repository/IWhatsApiAdapter'
 
 export class WhatsApiAdapter implements IWhatsApiAdapter {
-	async send(){}
+  constructor(private whatApiService: any) { }
+  async send() { }
 
 }

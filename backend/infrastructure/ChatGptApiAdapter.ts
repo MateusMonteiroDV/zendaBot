@@ -17,7 +17,7 @@ export class ChatApiAdapter implements IChatApiAdapter {
       model: "llama-3.3-70b-versatile",
     });
 
-    const text: string | null = response.choices[0].message.content
+    const text = response.choices[0].message.content
     return text
   }
 }
