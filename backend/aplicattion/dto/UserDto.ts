@@ -1,11 +1,11 @@
 export interface WhatSendMessageDto {
-  to: string;
-  text: string
+  to: string | null;
+  text: string | null
 
 }
 
 export interface ChatMessageDto {
-  message: string;
+  message?: string | null;
 
 }
 export interface UserDtoToken {

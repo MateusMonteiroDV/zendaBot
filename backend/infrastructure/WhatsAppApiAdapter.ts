@@ -29,12 +29,12 @@ export class WhatsApiAdapter implements IWhatsApiAdapter {
     );
   }
 
-  async handleIncoming() {
+  async handleIncoming(payload: any) {
     const message = payload.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
     if (!message) return null;
 
     return {
-      from: message.from,
+      to: message.from,
       text: message.text?.body,
     };
   }
