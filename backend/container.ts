@@ -9,6 +9,9 @@ import { UserRepository } from './infrastructure/model/UserRepository.js'
 import { RegisterUserCase } from './aplicattion/use-cases/User/RegisterUserCase.js';
 import { LoginUserCase } from './aplicattion/use-cases/User/LoginUserCase.js';
 import { UserController } from './router/user/UserController.js';
+
+import { WhatController } from './router/whatssap/WhatControler.js'
+
 import { ChatApiAdapter } from './infrastructure/ChatGptApiAdapter.js';
 
 import { WhatsApiAdapter } from './infrastructure/WhatsAppApiAdapter.js';
@@ -31,10 +34,11 @@ let whatApiAdapter: WhatsApiAdapter = new WhatsApiAdapter(process.env.WHAT_ID_PH
 let processIncomingMessage: ProcessingIncomingMessage = new ProcessingIncomingMessage(chatApiAdapter, whatApiAdapter)
 
 let userController: UserController = new UserController(registerUserCase, loginUserCase);
-
+let whatController: WhatController = new WhatController(processIncomingMessage)
 
 export const container = {
-  userController
+  userController,
+  whatController
 
 
 }
