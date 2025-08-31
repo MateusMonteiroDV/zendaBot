@@ -1,12 +1,21 @@
-import dotenv from 'dotenv';
-dotenv.config({ path: './.env' });
 
-import express from 'express';
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.join(__dirname, "./.env") });
+
+import express from 'express'
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
 import userRouter from './router/user/index.js';
+import whatRouter from './router/whatssap/index.js';
+
 const app = express();
+
 
 const corsOptions = {
   origin:
@@ -26,6 +35,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api', userRouter);
+app.use('/', whatRouter);
 
 app.listen(5000, () => {
   console.log(' Listening on port 5000');

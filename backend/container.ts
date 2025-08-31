@@ -1,6 +1,5 @@
-import dotenv from 'dotenv';
+import 'dotenv/config';
 
-dotenv.config({ path: './.env' })
 
 import Groq from 'groq-sdk'
 
@@ -18,8 +17,7 @@ import { WhatsApiAdapter } from './infrastructure/WhatsAppApiAdapter.js';
 import { ProcessingIncomingMessage } from './aplicattion/use-cases/ProcessIncomingMessage.js';
 
 
-
-let tokenJWT: TokenJWT = new TokenJWT(process.env.JWT_SECRET_KEY || '1234', process.env.JWT_EXSPIRES_TIME || '5hr');
+let tokenJWT: TokenJWT = new TokenJWT(process.env.JWT_TOKEN, process.env.JWT_EXSPIRES_TIME);
 let userRepository = new UserRepository();
 
 let registerUserCase: RegisterUserCase = new RegisterUserCase(userRepository, tokenJWT);
@@ -29,7 +27,8 @@ let groq: Groq = new Groq()
 
 let chatApiAdapter = new ChatApiAdapter(groq)
 
-let whatApiAdapter: WhatsApiAdapter = new WhatsApiAdapter(process.env.WHAT_ID_PHONE_NUMBER, process.env.WHAT_TOKEN)
+let whatApiAdapter: WhatsApiAdapter = new WhatsApiAdapter(process.env.WHAT_ID_PHONE_NUMBER,
+  process.env.WHAT_TOKEN)
 
 let processIncomingMessage: ProcessingIncomingMessage = new ProcessingIncomingMessage(chatApiAdapter, whatApiAdapter)
 
