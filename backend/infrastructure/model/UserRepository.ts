@@ -3,41 +3,26 @@ import { IUserRepository } from '../../repository/IUserRepository.js';
 import pool from '../db.js'
 import { UserOwnerDto, UserOwnerDtoEmail } from '../../aplicattion/dto/UserDto.js'
 
-import { v4 as generate_uuid } from 'uuid'
 
 
 
 export class UserRepository implements IUserRepository {
 
 
-  public async findByEmail(email: UserOwnerDtoEmail) {
-
-    try {
-      const client = await pool.connect();
-
-      const query = {
-        text: 'select email from user_owner where email = $1',
-        values: [email]
-
-      }
+  public async findByEmail(email: string) {
 
 
-      const result: QueryResult<any> = await client.query(query);
+    const client = await pool.connect();
 
-      client.release()
-
-
-      return result.rows[0]
-    } catch (err) {
-
-      console.log(err);
-
-      throw new Error('Error to find email' + err)
-
-
+    const query = {
+      text: 'select * from user_owner where email = $1',
+      values: [email],
 
     }
 
+
+    const result: QueryResult<any> = await client.query(query);
+    return result.rows[0]
   }
 
 

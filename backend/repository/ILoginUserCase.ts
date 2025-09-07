@@ -1,7 +1,7 @@
-import {UserOwnerLoginInputDto} from '../aplicattion/dto/UserDto'
+import { UserOwnerLoginInputDto } from '../aplicattion/dto/UserDto'
 
 export interface ILoginUserCase {
-	 execute(user:UserOwnerLoginInputDto): Promise<string | null >
+  execute(user: UserOwnerLoginInputDto): Promise<string | Error | null>
 
 
 }

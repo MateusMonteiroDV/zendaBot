@@ -27,6 +27,7 @@
    "include": [
     "./**/*.ts",
     "test/**/*.ts",
+    "end.d.ts"
    
   ],
   "exclude": [

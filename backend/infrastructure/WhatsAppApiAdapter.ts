@@ -1,13 +1,22 @@
+import 'dotenv/config';
+
 
 import { WhatSendMessageDto } from "../aplicattion/dto/UserDto";
 import { IWhatsApiAdapter } from "../repository/IWhatsApiAdapter";
 import axios from "axios";
 
+
+console.log(process.env.WHAT_TOKEN)
 export class WhatsApiAdapter implements IWhatsApiAdapter {
-  constructor(
-    private token: string,
-    private phoneNumberId: string
-  ) { }
+  private token: string
+  private phoneNumberId: string
+
+
+  constructor() {
+    this.token = process.env.WHAT_TOKEN!,
+      this.phoneNumberId = process.env.WHAT_ID_PHONE_NUMBER!
+
+  }
 
   async send(payload: WhatSendMessageDto) {
     const url = `https://graph.facebook.com/v21.0/${this.phoneNumberId}/messages`;

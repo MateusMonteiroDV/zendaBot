@@ -9,23 +9,26 @@ export class UserController {
   constructor(
     private registerUserCase: RegisterUserCase,
     private loginUserCase: LoginUserCase
-  ) {}
+  ) { }
 
   async registerController(req: Request, res: Response): Promise<void> {
     try {
       const user = req.body;
+      console.log(user)
       const token = await this.registerUserCase.execute(user);
       res.status(200).json({ token });
     } catch (err: any) {
       if (err.message === 'Email already exists') {
-         res.status(400).json({ message: err.message });
+        res.status(400).json({ message: err.message });
+        return
       }
 
       if (err.message === 'Email doesnt include @ or gmail.com') {
-         res.status(401).json({ message: err.message });
+        res.status(401).json({ message: err.message });
+        return
       }
+      console.error(err)
 
-      console.error(err);
       res.status(500).json({ message: 'Error from the server' });
     }
   }
@@ -40,7 +43,7 @@ export class UserController {
         err.message === 'Email doesnt exists' ||
         err.message === 'Password is wrong'
       ) {
-         res.status(400).json({ message: err.message });
+        res.status(400).json({ message: err.message });
       }
 
       console.error(err);

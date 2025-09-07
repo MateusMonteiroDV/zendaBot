@@ -17,7 +17,13 @@ export interface UserOwnerDtoEmail {
   email: string
 
 }
-
+export interface UserOwnerDb {
+  id: string;
+  user_name: string;
+  email: string;
+  user_password: string;
+  created_at: Date;
+}
 
 
 
