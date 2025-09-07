@@ -44,10 +44,14 @@ export class UserController {
         err.message === 'Password is wrong'
       ) {
         res.status(400).json({ message: err.message });
+        return
+
       }
 
       console.error(err);
       res.status(500).json({ message: 'Error from the server' });
+      return
+
     }
   }
 }
