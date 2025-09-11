@@ -13,7 +13,6 @@ export class User {
     if (!email.includes('@') || !email.includes('gmail.com')) {
       return Promise.resolve(false)
 
-
     }
 
     return Promise.resolve(true)
