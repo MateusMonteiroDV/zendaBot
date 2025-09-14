@@ -5,7 +5,6 @@ import * as bcrypt from 'bcrypt'
 import { UserOwnerLoginInputDto, UserOwnerDb } from '../../../aplicattion/dto/UserDto.js';
 
 
-
 export class LoginUserCase implements ILoginUserCase {
 
   constructor(
@@ -33,11 +32,5 @@ export class LoginUserCase implements ILoginUserCase {
     const token = await this.tokenJWT.encode({ id: user_owner.id });
 
     return token;
-
-
-
-
   }
-
-
 }

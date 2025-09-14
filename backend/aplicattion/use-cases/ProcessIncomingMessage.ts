@@ -12,30 +12,22 @@ export class ProcessingIncomingMessage implements IProcessingIncomingMessage {
 
   async execute(payload: any) {
 
-    try {
-      const what: WhatSendMessageDto | null = await this.whatApiAdapter.handleIncoming(payload)
-      if (!what) {
-        return null
-      }
-      const reply: string | null = await this.chatApiAdapter.reply({ message: what.text });
-      if (!reply) {
-        return null
-      }
-      await this.whatApiAdapter.send({
-        to: what.to,
-        text: reply
-      })
-    } catch (e) {
-      console.log(e)
-      return null
+    const what: WhatSendMessageDto | null = await this.whatApiAdapter.handleIncoming(payload)
+
+    if (!what) {
+      throw new Error('Something goes wrong with message')
     }
+    const reply: string | null = await this.chatApiAdapter.reply({ message: what.text });
+    if (!reply) {
+      throw new Error(undefined)
+
+    }
+    await this.whatApiAdapter.send({
+      to: what.to,
+      text: reply
+    })
+
+    return null
 
   }
-
-
-
-
-
-
-
 }
