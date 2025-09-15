@@ -1,14 +1,18 @@
+import { Link } from 'react-router-dom'
+export default function Sidebar() {
 
 
-export function Sidebar() {
-	
+  return (
+    <header className="flex justify-center items-center bg-black text-white gap-4 p-4">
+      <Link to='/login'>logar</Link>
+      <Link to='/register'>register</Link>
+      <Link to='/price'>price</Link>
+      <Link to='/about'>about</Link>
 
-	return (
-		<header className="flex justify-center items-center bg-black text-white gap-4 p-4">
-			<a href="#">home</a>
-			<a href="#">produtos</a>
-			<a href="#">categorias</a>
-			<a href="#">rastreio</a>
-		</header>
-	);
+
+
+
+
+    </header>
+  );
 }
