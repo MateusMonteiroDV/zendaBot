@@ -5,7 +5,6 @@ import Groq from 'groq-sdk'
 export class ChatApiAdapter implements IChatApiAdapter {
   constructor(private grogApiService: Groq) { }
 
-
   async reply(message: ChatMessageDto) {
     const response = await this.grogApiService.chat.completions.create({
       messages: [

@@ -5,12 +5,9 @@ import { WhatSendMessageDto } from "../aplicattion/dto/UserDto";
 import { IWhatsApiAdapter } from "../repository/IWhatsApiAdapter";
 import axios from "axios";
 
-
-console.log(process.env.WHAT_TOKEN)
 export class WhatsApiAdapter implements IWhatsApiAdapter {
   private token: string
   private phoneNumberId: string
-
 
   constructor() {
     this.token = process.env.WHAT_TOKEN!,

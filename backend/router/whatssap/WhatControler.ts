@@ -14,6 +14,8 @@ export class WhatController {
 
       res.status(200).json({ message: "ok" })
     } catch (e) {
+
+      console.log(e)
       res.status(500).json({ error: "Error from the server" })
     }
   }

@@ -15,10 +15,6 @@ import { ChatApiAdapter } from './infrastructure/ChatGptApiAdapter.js';
 import { WhatsApiAdapter } from './infrastructure/WhatsAppApiAdapter.js';
 import { ProcessingIncomingMessage } from './aplicattion/use-cases/ProcessIncomingMessage.js';
 
-console.log(process.env.JWT_SECRET_KEY,
-  process.env.USER_DATABASE_DEV
-
-)
 
 let tokenJWT: TokenJWT = new TokenJWT();
 
