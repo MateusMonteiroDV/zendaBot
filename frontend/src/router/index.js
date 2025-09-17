@@ -10,9 +10,10 @@ export default function RouterApp() {
 
 
         <Routes>
-          <Route path='register' element={<Register />} />
+          <Route path='/register' element={<Register />} />
+          <Route path='/login' element={<Login />} />
+
           <Route path='/' element={<Home />}>
-            <Route path='login' element={<Login />} />
             <Route path='about' element={<Register />} />
             <Route path='price' element={<Register />} />
           </Route>

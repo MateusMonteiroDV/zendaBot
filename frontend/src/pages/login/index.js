@@ -1,5 +1,5 @@
 import { useState } from "react"
-
+import { Helmet } from "react-helmet-async";
 export default function Login() {
   const [user, setUser] = useState({
     email: '',
@@ -28,8 +28,15 @@ export default function Login() {
   }
   return (
     <>
+      <Helmet>
+        <title>zendaBot-Login</title>
+        <meta charSet="utf-8" />
+        <meta name="description" content="Login to acess zendaBot" />
+        <meta name="viewport" content="width = device-width, initial-scale=1.0" />
+        <meta name="robots" content="index,follow" />
+      </Helmet>
       <main className="flex flex-col h-screen w-screen justify-center items-center">
-        <h2 className="m-5 "> Register for enter in zendaBot</h2>
+        <h2 className="m-5 "> Login for enter in zendaBot</h2>
         <form className="flex flex-col justify-center p-20 items-center gap-5  shadow-md" onSubmit={handleSubmit}>
           <input className=" border-2" onChange={handleEmail} placeholder=" enter your email"></input>
           <input className="border-2" onChange={handlePassword} placeholder=" enter your password"></input>
