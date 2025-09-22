@@ -3,6 +3,7 @@ import { IWhatsApiAdapter } from '../../repository/IWhatsApiAdapter'
 import { IChatApiAdapter } from '../../repository/IChatApiAdapter'
 import { WhatSendMessageDto } from '../dto/UserDto'
 
+
 export class ProcessingIncomingMessage implements IProcessingIncomingMessage {
 
   constructor(

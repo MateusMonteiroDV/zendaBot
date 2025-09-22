@@ -1,18 +1,16 @@
-import 'dotenv/config';
-
+import "dotenv/config";
 
 import { WhatSendMessageDto } from "../aplicattion/dto/UserDto";
 import { IWhatsApiAdapter } from "../repository/IWhatsApiAdapter";
 import axios from "axios";
 
 export class WhatsApiAdapter implements IWhatsApiAdapter {
-  private token: string
-  private phoneNumberId: string
+  private token: string;
+  private phoneNumberId: string;
 
   constructor() {
-    this.token = process.env.WHAT_TOKEN!,
-      this.phoneNumberId = process.env.WHAT_ID_PHONE_NUMBER!
-
+    this.token = process.env.WHAT_TOKEN!;
+    this.phoneNumberId = process.env.WHAT_ID_PHONE_NUMBER!;
   }
 
   async send(payload: WhatSendMessageDto) {
@@ -31,7 +29,7 @@ export class WhatsApiAdapter implements IWhatsApiAdapter {
           Authorization: `Bearer ${this.token}`,
           "Content-Type": "application/json",
         },
-      }
+      },
     );
   }
 
@@ -45,4 +43,3 @@ export class WhatsApiAdapter implements IWhatsApiAdapter {
     };
   }
 }
-
