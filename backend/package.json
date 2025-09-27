@@ -14,7 +14,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@whiskeysockets/baileys": "^7.0.0-rc.4",
     "axios": "^1.11.0",
+    "baileys": "^7.0.0-rc.4",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -23,6 +25,7 @@
     "groq-sdk": "^0.30.0",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.3",
+    "qrcode": "^1.5.4",
     "router": "^2.2.0",
     "uuid": "^11.1.0"
   },
@@ -35,6 +38,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.0.3",
     "@types/pg": "^8.15.4",
+    "@types/qrcode": "^1.5.5",
     "jest": "^30.0.5",
     "rimraf": "^6.0.1",
     "ts-jest": "^29.4.0",
