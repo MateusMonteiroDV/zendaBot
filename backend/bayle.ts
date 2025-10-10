@@ -6,7 +6,7 @@ import makeWASocket, {
 
 import qrcode from "qrcode-terminal";
 import { Boom } from "@hapi/boom";
-import fs from "fs-extra"; // npm install fs-extra
+import fs from "fs-extra";
 
 export async function startEventWhatssap() {
   const { state, saveCreds } = await useMultiFileAuthState("auth");

@@ -1,21 +1,17 @@
 export interface WhatSendMessageDto {
   to: string | null;
-  text: string | null
-
+  text: string | null;
 }
 
 export interface ChatMessageDto {
   message?: string | null;
-
 }
 export interface UserDtoToken {
-  id: string
-};
-
+  id: string;
+}
 
 export interface UserOwnerDtoEmail {
-  email: string
-
+  email: string;
 }
 export interface UserOwnerDb {
   id: string;
@@ -40,13 +36,8 @@ export interface UserOwnerLoginInputDto {
   email: string;
   password: string;
 }
-export type UserOwnerRegiserOutputDto = string
+export type UserOwnerRegiserOutputDto = string;
 
 export interface UserOwnerResponseDto {
-  id: string
+  id: string;
 }
-
-
-
-
-

@@ -1,22 +1,22 @@
-import { IChatApiAdapter } from '../repository/IChatApiAdapter'
-import { ChatMessageDto } from '../aplicattion/dto/UserDto.js'
-import Groq from 'groq-sdk'
+import { IChatApiAdapter } from "../repository/IChatApiAdapter";
+import { ChatMessageDto } from "../aplicattion/dto/UserDto.js";
+import Groq from "groq-sdk";
 
 export class ChatApiAdapter implements IChatApiAdapter {
-  constructor(private grogApiService: Groq) { }
+  constructor(private grogApiService: Groq) {}
 
   async reply(message: ChatMessageDto) {
     const response = await this.grogApiService.chat.completions.create({
       messages: [
         {
           role: "user",
-          content: "Explain the importance of fast language models",
+          content: "Fale formalemnte pra um cliente ",
         },
       ],
       model: "llama-3.3-70b-versatile",
     });
 
-    const text = response.choices[0].message.content
-    return text
+    const text = response.choices[0].message.content;
+    return text;
   }
 }
