@@ -10,7 +10,8 @@ export class ChatApiAdapter implements IChatApiAdapter {
       messages: [
         {
           role: "user",
-          content: "Fale formalemnte pra um cliente ",
+          content:
+            "Responda adequdadamente conforme o que for enviado para você",
         },
       ],
       model: "llama-3.3-70b-versatile",

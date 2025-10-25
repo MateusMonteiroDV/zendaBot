@@ -1,9 +1,9 @@
+import { container } from "./container.js";
 import makeWASocket, {
   useMultiFileAuthState,
   DisconnectReason,
   Browsers,
 } from "@whiskeysockets/baileys";
-
 import qrcode from "qrcode-terminal";
 import { Boom } from "@hapi/boom";
 import fs from "fs-extra";
@@ -15,10 +15,9 @@ export async function startEventWhatssap() {
     auth: state,
     browser: Browsers.ubuntu("Chrome"),
     printQRInTerminal: false,
-    defaultQueryTimeoutMs: 0,
   });
 
-  sock.ev.on("creds.update", saveCreds);
+  container.processIncomingMessage.setSocket(sock);
 
   sock.ev.on("connection.update", async (update) => {
     const { connection, lastDisconnect, qr } = update;
@@ -31,10 +30,7 @@ export async function startEventWhatssap() {
       const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
 
       if (statusCode === DisconnectReason.loggedOut) {
-        console.log("Session logged out. Clearing saved auth...");
-
         await fs.remove("auth");
-
         startEventWhatssap();
       }
 
@@ -50,10 +46,18 @@ export async function startEventWhatssap() {
     }
   });
 
-  sock.ev.on("messages.upsert", (m) => {
-    if (m.messages && m.messages.length > 0) {
-      const msg = m.messages[0];
-      console.log("Message Received: ", msg.message);
+  sock.ev.on("messages.upsert", async (m) => {
+    if (!m.messages || m.messages.length === 0) return;
+    const msg = m.messages[0];
+    try {
+      if (!msg.message) return;
+      await container.processIncomingMessage.execute(msg);
+    } catch (err) {
+      console.error("Failed to process message:", err);
     }
   });
+
+  sock.ev.on("creds.update", saveCreds);
+
+  console.log("✅ WhatsApp connection ready");
 }

@@ -8,11 +8,11 @@ import { RegisterUserCase } from "./aplicattion/use-cases/User/RegisterUserCase.
 import { LoginUserCase } from "./aplicattion/use-cases/User/LoginUserCase.js";
 import { UserController } from "./router/user/UserController.js";
 
-import { WhatController } from "./router/whatssap/WhatControler.js";
+//import { WhatController } from "./router/whatssap/WhatControler.js";
 
 import { ChatApiAdapter } from "./infrastructure/ChatGptApiAdapter.js";
 
-import { WhatsApiAdapter } from "./infrastructure/WhatsAppApiAdapter.js";
+import { BaileysApiAdapter } from "./infrastructure/WhatsAppApiAdapter.js";
 import { ProcessingIncomingMessage } from "./aplicattion/use-cases/ProcessIncomingMessage.js";
 import { AuthMiddleware } from "./middleware/auth.js";
 
@@ -27,23 +27,24 @@ let registerUserCase: RegisterUserCase = new RegisterUserCase(
 );
 let loginUserCase: LoginUserCase = new LoginUserCase(userRepository, tokenJWT);
 
+console.log("GROQ_API_KEY:", process.env.GROQ_API_KEY);
 let groq: Groq = new Groq();
 
 let chatApiAdapter = new ChatApiAdapter(groq);
 
-let whatApiAdapter: WhatsApiAdapter = new WhatsApiAdapter();
+let baileysApiAdapter: BaileysApiAdapter = new BaileysApiAdapter();
 
 let processIncomingMessage: ProcessingIncomingMessage =
-  new ProcessingIncomingMessage(chatApiAdapter, whatApiAdapter);
+  new ProcessingIncomingMessage(chatApiAdapter, baileysApiAdapter);
 
 let userController: UserController = new UserController(
   registerUserCase,
   loginUserCase,
 );
-let whatController: WhatController = new WhatController(processIncomingMessage);
+//let whatController: WhatController = new WhatController(processIncomingMessage);
 
 export const container = {
   userController,
-  whatController,
   authMiddleware,
+  processIncomingMessage,
 };

@@ -1,3 +1,4 @@
+/*
 import { ProcessingIncomingMessage } from '../../aplicattion/use-cases/ProcessIncomingMessage'
 import { Request, Response } from 'express'
 
@@ -20,3 +21,4 @@ export class WhatController {
     }
   }
 }
+*/

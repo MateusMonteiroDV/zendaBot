@@ -1,45 +1,25 @@
-import "dotenv/config";
-
 import { WhatSendMessageDto } from "../aplicattion/dto/UserDto";
 import { IWhatsApiAdapter } from "../repository/IWhatsApiAdapter";
-import axios from "axios";
 
-export class WhatsApiAdapter implements IWhatsApiAdapter {
-  private token: string;
-  private phoneNumberId: string;
+export class BaileysApiAdapter implements IWhatsApiAdapter {
+  private sock: any | null = null;
 
-  constructor() {
-    this.token = process.env.WHAT_TOKEN!;
-    this.phoneNumberId = process.env.WHAT_ID_PHONE_NUMBER!;
+  setSocket(sock: any) {
+    this.sock = sock;
   }
 
   async send(payload: WhatSendMessageDto) {
-    const url = `https://graph.facebook.com/v21.0/${this.phoneNumberId}/messages`;
-
-    await axios.post(
-      url,
-      {
-        messaging_product: "whatsapp",
-        to: payload.to,
-        type: "text",
-        text: { body: payload.text },
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${this.token}`,
-          "Content-Type": "application/json",
-        },
-      },
-    );
+    if (!this.sock) throw new Error("Socket not initialized");
+    await this.sock.sendMessage(payload.to, { text: payload.text });
   }
 
   async handleIncoming(payload: any) {
-    const message = payload.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+    const message = payload.message?.conversation;
     if (!message) return null;
 
     return {
-      to: message.from,
-      text: message.text?.body,
+      to: payload.key.remoteJid,
+      text: message,
     };
   }
 }
