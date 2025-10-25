@@ -4,7 +4,7 @@ export interface WhatSendMessageDto {
 }
 
 export interface ChatMessageDto {
-  message?: string | null;
+  text?: string | null;
 }
 export interface UserDtoToken {
   id: string;

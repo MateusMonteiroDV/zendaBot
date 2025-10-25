@@ -5,18 +5,21 @@ import Groq from "groq-sdk";
 export class ChatApiAdapter implements IChatApiAdapter {
   constructor(private grogApiService: Groq) {}
 
-  async reply(message: ChatMessageDto) {
+  async reply(message: string) {
     const response = await this.grogApiService.chat.completions.create({
+      model: "llama-3.1-8b-instant",
       messages: [
         {
-          role: "user",
+          role: "system",
           content:
-            "Responda adequdadamente conforme o que for enviado para você",
+            "Você está conversando no WhatsApp. Responda como uma pessoa normal, de forma natural e descontraída, falando sobre qualquer assunto que a outra pessoa mencionar.",
+        },
+        {
+          role: "user",
+          content: message,
         },
       ],
-      model: "llama-3.3-70b-versatile",
     });
-
     const text = response.choices[0].message.content;
     return text;
   }

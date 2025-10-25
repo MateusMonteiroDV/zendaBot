@@ -1,5 +1,5 @@
 import { ChatMessageDto } from "../aplicattion/dto/UserDto";
 
 export interface IChatApiAdapter {
-  reply(message: ChatMessageDto): Promise<string | null>
+  reply(message: string | null): Promise<string | null>;
 }

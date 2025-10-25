@@ -20,9 +20,7 @@ export class ProcessingIncomingMessage implements IProcessingIncomingMessage {
     if (!what) {
       throw new Error("Something goes wrong with message");
     }
-    const reply: string | null = await this.chatApiAdapter.reply({
-      message: what.text,
-    });
+    const reply: string | null = await this.chatApiAdapter.reply(what.text);
     if (!reply) {
       throw new Error(undefined);
     }
