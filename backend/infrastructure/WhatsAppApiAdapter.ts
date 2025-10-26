@@ -14,11 +14,14 @@ export class BaileysApiAdapter implements IWhatsApiAdapter {
   }
 
   async handleIncoming(payload: any) {
-    const message = payload.message?.conversation;
+    const message =
+      payload.message?.conversation ||
+      payload.message?.extendedTextMessage?.text;
     if (!message) return null;
-
+    if (payload.key.fromMe) return null;
+    const from = payload.key.participant || payload.key.remoteJid;
     return {
-      to: payload.key.remoteJid,
+      to: from,
       text: message,
     };
   }
