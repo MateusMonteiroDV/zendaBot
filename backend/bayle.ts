@@ -32,11 +32,11 @@ export async function createSocket(number:string) {
 
       if (statusCode === DisconnectReason.loggedOut) {
         await fs.remove("auth");
-        createSocket();
+        createSocket(number);
       }
 
       if (shouldReconnect) {
-        createSocket();
+        createSocket(number);
       }
     } else if (connection === "open") {
       console.log("✅ WhatsApp connection opened");
@@ -52,7 +52,7 @@ export async function createSocket(number:string) {
     const msg = m.messages[0];
     try {
       if (!msg.message) return;
-      await container.processIncomingMessage.execute(msg);
+      await container.processIncomingMessage.execute(msg,number);
     } catch (err) {
       console.error("Failed to process message:", err);
     }

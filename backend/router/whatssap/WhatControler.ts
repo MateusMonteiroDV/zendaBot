@@ -1,16 +1,14 @@
 
-import { ProcessingIncomingMessage } from '../../aplicattion/use-cases/ProcessIncomingMessage'
 import { Request, Response } from 'express'
-import {addNumber} from 'socketManager.js'
+import {container} from "../../container.js"
 
 export class WhatController {
-  constructor(
-    private processingIncomingMessage: ProcessingIncomingMessage
-  ) { }
+  constructor() { }
   async incomingMessageControler(req: Request, res: Response): Promise<any> {
     const {number} = req.body
     try {
-      await addNumber(number) 
+
+     await container.whatApiFactory.getSession(number)      
       res.status(200).json({ message: "ok" })
     } catch (e) {
 

@@ -12,7 +12,7 @@ import { WhatController } from "./router/whatssap/WhatControler.js";
 
 import { ChatApiAdapter } from "./infrastructure/ChatGptApiAdapter.js";
 
-import { BaileysApiAdapter } from "./infrastructure/WhatsAppApiAdapter.js";
+import { WhatsApiAdapterFactory } from "./infrastructure/SessionManager.js";
 import { ProcessingIncomingMessage } from "./aplicattion/use-cases/ProcessIncomingMessage.js";
 import { AuthMiddleware } from "./middleware/auth.js";
 
@@ -33,20 +33,21 @@ let groq: Groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 let chatApiAdapter = new ChatApiAdapter(groq);
 
-let baileysApiAdapter: BaileysApiAdapter = new BaileysApiAdapter();
+let whatApiFactory = new WhatsApiAdapterFactory()
 
 let processIncomingMessage: ProcessingIncomingMessage =
-  new ProcessingIncomingMessage(chatApiAdapter, baileysApiAdapter);
+  new ProcessingIncomingMessage(chatApiAdapter, whatApiFactory );
 
 let userController: UserController = new UserController(
   registerUserCase,
   loginUserCase,
 );
-let whatController: WhatController = new WhatController(processIncomingMessage);
+let whatController: WhatController = new WhatController();
 
 export const container = {
   userController,
   whatController,
   authMiddleware,
   processIncomingMessage,
+  whatApiFactory
 };

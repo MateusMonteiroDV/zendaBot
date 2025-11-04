@@ -1,28 +1,34 @@
-import { WhatSendMessageDto } from "../aplicattion/dto/UserDto";
-import { IWhatsApiAdapter } from "../repository/IWhatsApiAdapter";
+import makeWASocket, { useMultiFileAuthState, WASocket } from "@whiskeysockets/baileys";
+import { WhatSendMessageDto } from "../aplicattion/dto/UserDto.js";
+import { IWhatsApiAdapter } from "../repository/IWhatsApiAdapter.js";
 
 export class BaileysApiAdapter implements IWhatsApiAdapter {
-  private sock: any | null = null;
+  private sock: WASocket | null = null;
+
+  constructor(private number: string) {
+    this.initialize();
+  }
+
+  private async initialize() {
+    const { state, saveCreds } = await useMultiFileAuthState(`sessions/${this.number}`);
+    this.sock = makeWASocket({ auth: state });
+    this.sock.ev.on("creds.update", saveCreds);
+  }
 
   setSocket(sock: any) {
     this.sock = sock;
   }
 
-  async send(payload: WhatSendMessageDto) {
-    if (!this.sock) throw new Error("Socket not initialized");
-    await this.sock.sendMessage(payload.to, { text: payload.text });
+  async handleIncoming(payload: any): Promise<WhatSendMessageDto | null> {
+    const text = payload?.message?.conversation;
+    const to = payload?.key?.remoteJid;
+    if (!text || !to) return null;
+    return { to, text };
   }
 
-  async handleIncoming(payload: any) {
-    const message =
-      payload.message?.conversation ||
-      payload.message?.extendedTextMessage?.text;
-    if (!message) return null;
-    if (payload.key.fromMe) return null;
-    const from = payload.key.participant || payload.key.remoteJid;
-    return {
-      to: from,
-      text: message,
-    };
+  async sendMessage(to: string, text: string) {
+    if (!this.sock) throw new Error("Socket not initialized");
+    await this.sock.sendMessage(to, { text });
   }
 }
+
