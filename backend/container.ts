@@ -8,7 +8,7 @@ import { RegisterUserCase } from "./aplicattion/use-cases/User/RegisterUserCase.
 import { LoginUserCase } from "./aplicattion/use-cases/User/LoginUserCase.js";
 import { UserController } from "./router/user/UserController.js";
 
-//import { WhatController } from "./router/whatssap/WhatControler.js";
+import { WhatController } from "./router/whatssap/WhatControler.js";
 
 import { ChatApiAdapter } from "./infrastructure/ChatGptApiAdapter.js";
 
@@ -42,10 +42,11 @@ let userController: UserController = new UserController(
   registerUserCase,
   loginUserCase,
 );
-//let whatController: WhatController = new WhatController(processIncomingMessage);
+let whatController: WhatController = new WhatController(processIncomingMessage);
 
 export const container = {
   userController,
+  whatController,
   authMiddleware,
   processIncomingMessage,
 };

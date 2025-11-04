@@ -7,8 +7,9 @@ import makeWASocket, {
 import qrcode from "qrcode-terminal";
 import { Boom } from "@hapi/boom";
 import fs from "fs-extra";
+import { create } from "domain";
 
-export async function startEventWhatssap() {
+export async function createSocket(number:string) {
   const { state, saveCreds } = await useMultiFileAuthState("auth");
 
   const sock = makeWASocket({
@@ -31,11 +32,11 @@ export async function startEventWhatssap() {
 
       if (statusCode === DisconnectReason.loggedOut) {
         await fs.remove("auth");
-        startEventWhatssap();
+        createSocket();
       }
 
       if (shouldReconnect) {
-        startEventWhatssap();
+        createSocket();
       }
     } else if (connection === "open") {
       console.log("✅ WhatsApp connection opened");

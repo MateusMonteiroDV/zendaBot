@@ -4,10 +4,10 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-import { startEventWhatssap } from "./bayle.js";
+import { createSocket } from "./bayle.js";
 
 import userRouter from "./router/user/index.js";
-//import whatRouter from "./router/whatssap/index.js";
+import whatRouter from "./router/whatssap/index.js";
 
 console.log(process.env.JWT_SECRET_KEY, process.env.USER_DATABASE_DEV);
 
@@ -32,9 +32,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", userRouter);
-//app.use("/", whatRouter);
+app.use("/", whatRouter);
 
-startEventWhatssap();
+createSocket();
 
 app.listen(5000, () => {
   console.log("✅ Listening on port 5000");
