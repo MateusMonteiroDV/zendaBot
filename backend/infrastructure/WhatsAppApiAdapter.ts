@@ -1,7 +1,7 @@
 import makeWASocket, { useMultiFileAuthState, WASocket } from "@whiskeysockets/baileys";
 import { WhatSendMessageDto } from "../aplicattion/dto/UserDto.js";
 import { IWhatsApiAdapter } from "../repository/IWhatsApiAdapter.js";
-
+import {createSocket} from "../bayle.js"
 export class BaileysApiAdapter implements IWhatsApiAdapter {
   private sock: WASocket | null = null;
 
@@ -10,9 +10,7 @@ export class BaileysApiAdapter implements IWhatsApiAdapter {
   }
 
   private async initialize() {
-    const { state, saveCreds } = await useMultiFileAuthState(`sessions/${this.number}`);
-    this.sock = makeWASocket({ auth: state });
-    this.sock.ev.on("creds.update", saveCreds);
+    await createSocket(this.number)
   }
 
   setSocket(sock: any) {

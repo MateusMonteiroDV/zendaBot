@@ -1,16 +1,11 @@
 import { container } from "./container.js";
-import makeWASocket, {
-  useMultiFileAuthState,
-  DisconnectReason,
-  Browsers,
-} from "@whiskeysockets/baileys";
+import makeWASocket, { DisconnectReason, Browsers } from "@whiskeysockets/baileys";
 import qrcode from "qrcode-terminal";
 import { Boom } from "@hapi/boom";
-import fs from "fs-extra";
-import { create } from "domain";
+import { useMongoAuthState } from "./infrastructure/MongoAuthState.js";
 
-export async function createSocket(number:string) {
-  const { state, saveCreds } = await useMultiFileAuthState("auth");
+export async function createSocket(number: string) {
+  const { state, saveCreds } = await useMongoAuthState(number);
 
   const sock = makeWASocket({
     auth: state,
@@ -18,20 +13,14 @@ export async function createSocket(number:string) {
     printQRInTerminal: false,
   });
 
-  container.processIncomingMessage.setSocket(sock);
-
   sock.ev.on("connection.update", async (update) => {
     const { connection, lastDisconnect, qr } = update;
 
     if (connection === "close") {
       const statusCode = (lastDisconnect?.error as Boom)?.output?.statusCode;
-
-      console.log("Connection closed, reason:", statusCode);
-
       const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
 
       if (statusCode === DisconnectReason.loggedOut) {
-        await fs.remove("auth");
         createSocket(number);
       }
 
@@ -39,7 +28,7 @@ export async function createSocket(number:string) {
         createSocket(number);
       }
     } else if (connection === "open") {
-      console.log("✅ WhatsApp connection opened");
+      console.log(`[${number}] ✅ WhatsApp connection opened`);
     }
 
     if (qr) {
@@ -52,13 +41,12 @@ export async function createSocket(number:string) {
     const msg = m.messages[0];
     try {
       if (!msg.message) return;
-      await container.processIncomingMessage.execute(msg,number);
+      await container.processIncomingMessage.execute(msg, number);
     } catch (err) {
-      console.error("Failed to process message:", err);
+      console.error(`[${number}] Failed to process message:`, err);
     }
   });
 
   sock.ev.on("creds.update", saveCreds);
-
-  console.log("✅ WhatsApp connection ready");
 }
+

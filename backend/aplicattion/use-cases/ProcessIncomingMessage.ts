@@ -17,7 +17,7 @@ export class ProcessingIncomingMessage implements IProcessingincomingmessage{
 
     const reply = await this.chatApiAdapter.reply(what.text);
     if (!reply) throw new Error("Chat service returned no reply");
-
+    //@ts-ignore
     await whatApiAdapter.sendMessage(what.to, reply);
   }
 }

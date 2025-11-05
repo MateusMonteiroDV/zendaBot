@@ -3,8 +3,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-
-import { createSocket } from "./bayle.js";
+import mongoose from "mongoose";
 
 import userRouter from "./router/user/index.js";
 import whatRouter from "./router/whatssap/index.js";
@@ -34,7 +33,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api", userRouter);
 app.use("/", whatRouter);
 
-createSocket();
+mongoose
+  .connect(process.env.MONGO_URI || "mongodb://localhost:27017/baileysMulti")
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 app.listen(5000, () => {
   console.log("✅ Listening on port 5000");
