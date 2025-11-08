@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { initAuthCreds } from "@whiskeysockets/baileys";
+import { proto, initAuthCreds } from "@whiskeysockets/baileys";
 
 const sessionSchema = new mongoose.Schema({
   number: { type: String, unique: true },
@@ -9,20 +9,44 @@ const sessionSchema = new mongoose.Schema({
 
 const Session = mongoose.model("Session", sessionSchema);
 
-type KeysType = {
-  [category: string]: { [id: string]: any };
-};
+type KeysType = Record<string, Record<string, any>>;
+
+function serialize(obj: any) {
+  return JSON.parse(
+    JSON.stringify(obj, (key, value) => {
+      if (Buffer.isBuffer(value)) {
+        return { _isBuffer: true, data: value.toString("base64") };
+      }
+      return value;
+    })
+  );
+}
+
+function deserialize(obj: any) {
+  if (!obj) return obj;
+  return JSON.parse(JSON.stringify(obj), (key, value) => {
+    if (
+      value &&
+      typeof value === "object" &&
+      value.type === "Buffer" &&
+      Array.isArray(value.data)
+    ) {
+      return Buffer.from(value.data);
+    }
+    return value;
+  });
+}
 
 export async function useMongoAuthState(number: string) {
-  let session = await Session.findOne({ number }).lean();
+  const session = await Session.findOne({ number }).lean();
 
-  let creds = session?.creds ? JSON.parse(JSON.stringify(session.creds)) : initAuthCreds();
-  let keys: KeysType = session?.keys ? JSON.parse(JSON.stringify(session.keys)) : {};
+  const creds = session?.creds ? deserialize(session.creds) : initAuthCreds();
+  const keys: KeysType = session?.keys ? deserialize(session.keys) : {};
 
   async function saveCreds() {
     await Session.updateOne(
       { number },
-      { creds: JSON.parse(JSON.stringify(creds)), keys: JSON.parse(JSON.stringify(keys)) },
+      { creds: serialize(creds), keys: serialize(keys) },
       { upsert: true }
     );
   }
@@ -31,9 +55,13 @@ export async function useMongoAuthState(number: string) {
     creds,
     keys: {
       get: async (type: string, ids: string[]) => {
-        const data: { [id: string]: any } = {};
+        const data: Record<string, any> = {};
         for (const id of ids) {
-          data[id] = keys[type]?.[id] || null;
+          let value = keys[type]?.[id];
+          if (type === "app-state-sync-key" && value) {
+            value = proto.Message.AppStateSyncKeyData.fromObject(value);
+          }
+          data[id] = value || null;
         }
         return data;
       },
