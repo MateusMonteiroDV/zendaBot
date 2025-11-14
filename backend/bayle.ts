@@ -29,17 +29,38 @@ export async function createSocket(number: string) {
     if (qr) qrcode.generate(qr, { small: true });
   });
 
-  sock.ev.on("messages.upsert", async (m) => {
-    if (!m.messages || m.messages.length === 0) return;
-    const msg = m.messages[0];
-    if (!msg.message) return;
-    try {
-      await container.processIncomingMessage.execute(msg, number);
-    } catch (err) {
-      console.error(`[${number}] Failed to process message:`, err);
-    }
-  });
+sock.ev.on("messages.upsert", async (m) => {
+  console.log("Received upsert:", m);
+
+  if (!m.messages || m.messages.length === 0) {
+    console.log("No messages found");
+    return;
+  }
+  if (!sock || !sock.user) {
+    console.log("Socket not ready or user not set");
+    return;
+  }
+
+  const msg = m.messages[0];
+  console.log("Processing message:", msg);
+
+  const phoneNumber = sock.user.id.split(':')[0];
+  console.log("Bot phone number:", phoneNumber);
+
+  if (!msg.message) {
+    console.log("No message content found");
+    return;
+  }
+
+  try {
+    await container.processIncomingMessage.execute(msg, phoneNumber);
+    console.log("Message processed successfully");
+  } catch (err) {
+    console.error(`[${phoneNumber}] Failed to process message:`, err);
+  }
+});
 
   sock.ev.on("creds.update", saveCreds);
+  return sock
 }
 

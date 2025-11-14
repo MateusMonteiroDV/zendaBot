@@ -1,7 +1,8 @@
-import makeWASocket, { useMultiFileAuthState, WASocket } from "@whiskeysockets/baileys";
 import { WhatSendMessageDto } from "../aplicattion/dto/UserDto.js";
 import { IWhatsApiAdapter } from "../repository/IWhatsApiAdapter.js";
-import {createSocket} from "../bayle.js"
+import { createSocket } from "../bayle.js";
+import type { WASocket } from "@whiskeysockets/baileys";
+
 export class BaileysApiAdapter implements IWhatsApiAdapter {
   private sock: WASocket | null = null;
 
@@ -10,11 +11,12 @@ export class BaileysApiAdapter implements IWhatsApiAdapter {
   }
 
   private async initialize() {
-    await createSocket(this.number)
-  }
-
-  setSocket(sock: any) {
-    this.sock = sock;
+    this.sock = await createSocket(this.number);
+    await new Promise<void>((resolve) => {
+      this.sock?.ev.on("connection.update", (update) => {
+        if (update.connection === "open") resolve();
+      });
+    });
   }
 
   async handleIncoming(payload: any): Promise<WhatSendMessageDto | null> {
@@ -26,7 +28,11 @@ export class BaileysApiAdapter implements IWhatsApiAdapter {
 
   async sendMessage(to: string, text: string) {
     if (!this.sock) throw new Error("Socket not initialized");
+    if (to === this.number + "@s.whatsapp.net") {
+      await this.sock.presenceSubscribe(to);
+    }
     await this.sock.sendMessage(to, { text });
   }
 }
+
 
