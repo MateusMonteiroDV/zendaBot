@@ -50,7 +50,7 @@ export async function startEventWhatssap() {
     if (!m.messages || m.messages.length === 0) return;
     const msg = m.messages[0];
     try {
-      if (!msg.message) return;
+     if (!msg.message) return;
       await container.processIncomingMessage.execute(msg);
     } catch (err) {
       console.error("Failed to process message:", err);

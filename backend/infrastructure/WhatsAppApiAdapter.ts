@@ -18,7 +18,7 @@ export class BaileysApiAdapter implements IWhatsApiAdapter {
       payload.message?.conversation ||
       payload.message?.extendedTextMessage?.text;
     if (!message) return null;
-    if (payload.key.fromMe) return null;
+    if (payload.key.fromMe) return null
     const from = payload.key.participant || payload.key.remoteJid;
     return {
       to: from,
