@@ -13,22 +13,27 @@ export class GoogleCalendarService implements IGoogleCalendarService {
    * Instantiates an authenticated Google Calendar API client based on tenant credentials.
    */
   public getClient(config: TenantGoogleCalendarConfig): calendar_v3.Calendar {
-    if (config.serviceAccountEmail && config.serviceAccountPrivateKey) {
+    const saEmail = config.serviceAccountEmail || process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+    const saKey = config.serviceAccountPrivateKey || process.env.GOOGLE_SERVICE_ACCOUNT_KEY || process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY;
+    if (saEmail && saKey) {
       const auth = new google.auth.JWT({
-        email: config.serviceAccountEmail,
-        key: config.serviceAccountPrivateKey.replace(/\\n/g, "\n"),
+        email: saEmail,
+        key: saKey.replace(/\\n/g, "\n"),
         scopes: ["https://www.googleapis.com/auth/calendar"],
       });
       return google.calendar({ version: "v3", auth });
     }
 
-    if (config.refreshToken && config.clientId && config.clientSecret) {
+    const clientId = config.clientId || process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = config.clientSecret || process.env.GOOGLE_CLIENT_SECRET;
+    const refreshToken = config.refreshToken || process.env.GOOGLE_REFRESH_TOKEN;
+    if (refreshToken && clientId && clientSecret) {
       const oauth2Client = new google.auth.OAuth2(
-        config.clientId,
-        config.clientSecret
+        clientId,
+        clientSecret
       );
       oauth2Client.setCredentials({
-        refresh_token: config.refreshToken,
+        refresh_token: refreshToken,
         access_token: config.accessToken,
       });
       return google.calendar({ version: "v3", auth: oauth2Client });
@@ -40,8 +45,9 @@ export class GoogleCalendarService implements IGoogleCalendarService {
       return google.calendar({ version: "v3", auth: oauth2Client });
     }
 
-    if (config.apiKey) {
-      return google.calendar({ version: "v3", auth: config.apiKey });
+    const apiKey = config.apiKey || process.env.GOOGLE_CALENDAR_API_KEY;
+    if (apiKey) {
+      return google.calendar({ version: "v3", auth: apiKey });
     }
 
     // Default fallback
