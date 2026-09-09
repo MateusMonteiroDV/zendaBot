@@ -7,6 +7,11 @@ backend/dist/
 # Frontend
 frontend/node_modules/
 frontend/dist/
+frontend/build/
+
+# Sessions
+backend/auth/
+auth/
 
 .env
 # Common

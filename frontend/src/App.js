@@ -1,15 +1,15 @@
 import React from 'react';
-import logo from './logo.svg';
 import { HelmetProvider } from 'react-helmet-async';
 import RouterApp from './router';
-
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
-
-
-
   return (
-    <RouterApp />
+    <HelmetProvider>
+      <AuthProvider>
+        <RouterApp />
+      </AuthProvider>
+    </HelmetProvider>
   );
 }
 

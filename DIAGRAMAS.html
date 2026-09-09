@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagramas de Arquitetura - zendaBot</title>
+    <!-- Importando a biblioteca do Mermaid -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 1000px; margin: auto; }
+        .diagram-container { border: 1px solid #ddd; padding: 20px; margin-bottom: 40px; border-radius: 8px; background: #f9f9f9; }
+        h2 { color: #333; border-bottom: 2px solid #ddd; padding-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <h1>Visão Geral da Arquitetura (zendaBot)</h1>
+    <p>Todos os seus diagramas renderizados de uma só vez!</p>
+
+    <div class="diagram-container">
+        <h2>1. Visão Geral dos Módulos (Backend)</h2>
+        <pre class="mermaid">
+            graph TD
+                Router[backend/router] --> Application[backend/aplicattion]
+                Server[backend/server.ts / bayle.ts] --> Router
+                Server --> Infrastructure[backend/infrastructure]
+                Server --> Container[backend/container.ts]
+                Container --> Router
+                Container --> Application
+                Container --> Infrastructure
+                Application --> Domain[backend/domain]
+                Application --> Repository[backend/repository]
+                Infrastructure -. implements .-> Repository
+        </pre>
+    </div>
+
+    <div class="diagram-container">
+        <h2>2. Classes do Módulo Application</h2>
+        <pre class="mermaid">
+            classDiagram
+                class RegisterUserCase {
+                    -IUserRepository userRepository
+                    -ItokenJWT tokenJWT
+                    +execute(user: UserOwnerRegisterInputDto) string
+                }
+                class LoginUserCase {
+                    -IUserRepository userRepository
+                    -ItokenJWT tokenJWT
+                    +execute(user: UserOwnerLoginInputDto) string
+                }
+                class ProcessingIncomingMessage {
+                    -IChatApiAdapter chatApiAdapter
+                    -IWhatsApiAdapter whatApiAdapter
+                    +setSocket(sock: any) void
+                    +execute(payload: any) null
+                }
+        </pre>
+    </div>
+
+    <div class="diagram-container">
+        <h2>3. Classes do Módulo Infrastructure</h2>
+        <pre class="mermaid">
+            classDiagram
+                class BaileysApiAdapter {
+                    -any sock
+                    +setSocket(sock: any) void
+                    +send(payload: WhatSendMessageDto) Promise~void~
+                    +handleIncoming(payload: any) Promise~any~
+                }
+                class ChatApiAdapter {
+                    -Groq grogApiService
+                    +reply(message: string) Promise~string~
+                }
+                class UserRepository {
+                    +findByEmail(email: string) Promise~any~
+                    +save(user: UserOwnerDto) Promise~void~
+                }
+                class TokenJWT {
+                    -string secret
+                    -string expires
+                    +encode(payload: UserDtoToken) Promise~string~
+                    +decode(payload: string) Promise~UserDtoToken~
+                }
+        </pre>
+    </div>
+
+    <div class="diagram-container">
+        <h2>4. Fluxo: Recebimento e Resposta do WhatsApp</h2>
+        <pre class="mermaid">
+            sequenceDiagram
+                participant Ws as @whiskeysockets/baileys
+                participant Bayle as bayle.ts
+                participant UC as ProcessingIncomingMessage
+                participant WsAdapter as BaileysApiAdapter
+                participant GptAdapter as ChatApiAdapter (Groq)
+                
+                Ws->>Bayle: ev.emit("messages.upsert")
+                Bayle->>UC: execute(msg)
+                UC->>WsAdapter: handleIncoming(payload)
+                WsAdapter-->>UC: { to: remetente, text: "Oi" }
+                Note over WsAdapter: Descarta se for "fromMe"
+                UC->>GptAdapter: reply("Oi")
+                GptAdapter-->>UC: "Olá! Tudo bem?"
+                UC->>WsAdapter: send({ to: remetente, text: "Olá! Tudo bem?" })
+                WsAdapter->>Ws: sendMessage()
+                UC-->>Bayle: null
+        </pre>
+    </div>
+
+    <div class="diagram-container">
+        <h2>5. Fluxo: Registro de Usuário</h2>
+        <pre class="mermaid">
+            sequenceDiagram
+                participant Client as Web/Mobile Client
+                participant Ctrl as UserController
+                participant UC as RegisterUserCase
+                participant Repo as UserRepository
+                participant JWT as TokenJWT
+                
+                Client->>Ctrl: POST /api/register
+                Ctrl->>UC: execute(user)
+                UC->>Repo: findByEmail(email)
+                Repo-->>UC: undefined
+                Note over UC: Executa bcrypt.hash(password) & Gera UUID v4
+                UC->>Repo: save(new_user)
+                Repo-->>UC: void
+                UC->>JWT: encode({ id: new_user.id })
+                JWT-->>UC: "jwt_token_string"
+                UC-->>Ctrl: token
+                Ctrl-->>Client: 200 OK { token }
+        </pre>
+    </div>
+
+    <div class="diagram-container">
+        <h2>6. Fluxo: Login de Usuário</h2>
+        <pre class="mermaid">
+            sequenceDiagram
+                participant Client as Web/Mobile Client
+                participant Ctrl as UserController
+                participant UC as LoginUserCase
+                participant Repo as UserRepository
+                participant JWT as TokenJWT
+                
+                Client->>Ctrl: POST /api/login {email, password}
+                Ctrl->>UC: execute(user)
+                UC->>Repo: findByEmail(email)
+                Repo-->>UC: user_owner (Db)
+                Note over UC: Valida se usuário existe e<br/>compara bcrypt.compare(password)
+                UC->>JWT: encode({ id: user_owner.id })
+                JWT-->>UC: "jwt_token_string"
+                UC-->>Ctrl: token
+                Ctrl-->>Client: 200 OK { token }
+        </pre>
+    </div>
+
+</body>
+</html>

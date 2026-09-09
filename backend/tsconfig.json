@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2020",
+    "target": "es2022",
     "outDir": "./dist",
     "rootDir": ".",
     "lib": ["dom", "dom.iterable", "esnext"],
@@ -15,9 +15,8 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": false,
-    "noEmit": false,
-    "jsx": "react-jsx"
+    "noEmit": false
   },
-  "include": ["./**/*.ts", "test/**/*.ts", "end.d.ts"],
+  "include": ["src/**/*.ts", "tests/**/*.ts", "test/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
