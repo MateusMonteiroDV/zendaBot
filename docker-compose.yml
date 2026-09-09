@@ -2,7 +2,9 @@ version: "3.9"
 
 services:
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      network: host
     ports:
       - "5000:5000"
     env_file:
@@ -19,7 +21,9 @@ services:
       - zenda-network
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      network: host
     ports:
       - "3000:3000"
     environment:
