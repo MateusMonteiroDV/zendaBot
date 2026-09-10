@@ -11,7 +11,10 @@ services:
       NODE_ENV: development
       HOST_DATABASE_DEV: db
       PORT_DATABASE_DEV: 5432
+      TZ: America/Sao_Paulo
     volumes:
+      - ./backend:/app
+      - /app/node_modules
       - ./backend/auth:/app/auth
     depends_on:
       db:

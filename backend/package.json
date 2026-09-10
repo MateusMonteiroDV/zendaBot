@@ -4,7 +4,7 @@
   "description": "",
   "main": "./src/server.ts",
   "scripts": {
-    "dev": "tsc --noEmit && node --loader ts-node/esm ./src/server.ts",
+    "dev": "node --watch --loader ts-node/esm ./src/server.ts",
     "build": "rimraf ./dist && tsc",
     "start": "npm run build && node dist/src/server.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --maxWorkers=2 --forceExit"
