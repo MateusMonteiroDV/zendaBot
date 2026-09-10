@@ -8,6 +8,29 @@ import {
 import { TenantGoogleCalendarConfig } from "../../../domain/entities/Tenant.js";
 import { AppError } from "../../../domain/errors/AppError.js";
 
+function getTimezoneOffsetString(date: Date, timeZone: string): string {
+  try {
+    const parts = new Intl.DateTimeFormat("en-US", { timeZone, timeZoneName: "shortOffset" }).formatToParts(date);
+    const offsetPart = parts.find((p) => p.type === "timeZoneName")?.value || "";
+    if (offsetPart.startsWith("GMT")) {
+      const raw = offsetPart.replace("GMT", "").trim();
+      if (!raw) return "+00:00";
+      const sign = raw.startsWith("-") ? "-" : "+";
+      const partsNum = raw.replace(/^[+-]/, "").split(":");
+      const hours = String(parseInt(partsNum[0] || "0", 10)).padStart(2, "0");
+      const mins = String(parseInt(partsNum[1] || "0", 10)).padStart(2, "0");
+      return `${sign}${hours}:${mins}`;
+    }
+  } catch {}
+  return "-03:00";
+}
+
+function parseDateTimeInTzToUtc(dateStr: string, timeStr: string, timeZone: string): Date {
+  const refDate = new Date(`${dateStr}T12:00:00Z`);
+  const offset = getTimezoneOffsetString(refDate, timeZone);
+  return new Date(`${dateStr}T${timeStr}:00${offset}`);
+}
+
 export class GoogleCalendarService implements IGoogleCalendarService {
   /**
    * Instantiates an authenticated Google Calendar API client based on tenant credentials.
@@ -63,11 +86,11 @@ export class GoogleCalendarService implements IGoogleCalendarService {
     const timeZone = config.timeZone || "America/Sao_Paulo";
 
     const duration = config.appointmentDurationMinutes || 30;
-    const [startH, startM] = (config.businessHoursStart || "08:00").split(":").map(Number);
-    const [endH, endM] = (config.businessHoursEnd || "18:00").split(":").map(Number);
+    const startStr = config.businessHoursStart || "08:00";
+    const endStr = config.businessHoursEnd || "18:00";
 
-    const dayStart = new Date(`${date}T00:00:00`);
-    const dayEnd = new Date(`${date}T23:59:59`);
+    const dayStart = parseDateTimeInTzToUtc(date, "00:00", timeZone);
+    const dayEnd = parseDateTimeInTzToUtc(date, "23:59", timeZone);
 
     let existingEvents: calendar_v3.Schema$Event[] = [];
     try {
@@ -95,12 +118,8 @@ export class GoogleCalendarService implements IGoogleCalendarService {
       .filter((b) => !isNaN(b.start) && !isNaN(b.end));
 
     const slots: TimeSlot[] = [];
-    const businessStartMs = new Date(
-      `${date}T${String(startH).padStart(2, "0")}:${String(startM).padStart(2, "0")}:00`
-    ).getTime();
-    const businessEndMs = new Date(
-      `${date}T${String(endH).padStart(2, "0")}:${String(endM).padStart(2, "0")}:00`
-    ).getTime();
+    const businessStartMs = parseDateTimeInTzToUtc(date, startStr, timeZone).getTime();
+    const businessEndMs = parseDateTimeInTzToUtc(date, endStr, timeZone).getTime();
     const slotDurationMs = duration * 60 * 1000;
 
     for (let current = businessStartMs; current + slotDurationMs <= businessEndMs; current += slotDurationMs) {
