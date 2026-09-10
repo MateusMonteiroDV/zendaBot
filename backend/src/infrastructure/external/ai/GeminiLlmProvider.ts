@@ -6,7 +6,7 @@ export class GeminiLlmProvider implements ILlmProvider {
   private client: GoogleGenAI;
   private model: string;
 
-  constructor(apiKey?: string, model: string = process.env.GEMINI_MODEL || "gemini-2.5-flash") {
+  constructor(apiKey?: string, model: string = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite") {
     const key = apiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || "dummy_key";
     this.client = new GoogleGenAI({ apiKey: key });
     this.model = model;
