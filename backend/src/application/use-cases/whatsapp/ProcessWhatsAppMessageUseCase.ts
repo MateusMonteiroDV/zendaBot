@@ -27,12 +27,24 @@ export class ProcessWhatsAppMessageUseCase {
     const clientPhone = parsed.from.replace(/@.*$/, "");
     const clientName = context?.senderName || parsed.senderName || "Cliente";
 
+    const localCurrentDate = new Intl.DateTimeFormat("en-CA", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+
+    const localWeekday = new Intl.DateTimeFormat("pt-BR", {
+      timeZone,
+      weekday: "long",
+    }).format(new Date());
+
     const aiContext: AIConversationContext = {
       tenantId,
       businessName,
       clientPhone,
       clientName,
-      currentDate: new Date().toISOString().split("T")[0],
+      currentDate: `${localCurrentDate} (${localWeekday})`,
       timeZone,
     };
 
@@ -46,7 +58,8 @@ export class ProcessWhatsAppMessageUseCase {
         tenantId,
       });
     } catch (err: any) {
-      console.warn(`[ProcessWhatsAppMessageUseCase] Socket message delivery warning: ${err.message}`);
+      // Quando testando pelo Simulador ou Webhook antes de escanear o QR Code, o socket estará desconectado
+      console.log(`ℹ️ [ProcessWhatsAppMessageUseCase] WhatsApp socket offline (${err.message}). Resposta processada e entregue via HTTP/Simulador.`);
     }
 
     return reply;
