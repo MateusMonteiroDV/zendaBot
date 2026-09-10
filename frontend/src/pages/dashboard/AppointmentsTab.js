@@ -11,6 +11,7 @@ export default function AppointmentsTab() {
   const [loadingAppts, setLoadingAppts] = useState(false);
   const [searchPhone, setSearchPhone] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', text: '' });
 
   // Form states for manual booking
@@ -62,6 +63,23 @@ export default function AppointmentsTab() {
     loadSlots(newDate);
   };
 
+  const handleSlotClick = (slot) => {
+    const rawDate = typeof slot === 'object' && slot !== null ? slot.startTime : slot;
+    const d = new Date(rawDate);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const localIso = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+    setFormData((prev) => ({
+      ...prev,
+      startTime: localIso,
+    }));
+    setModalOpen(true);
+  };
+
   const handleCancelAppointment = async (appt) => {
     if (!window.confirm(`Tem certeza que deseja cancelar a consulta de ${appt.clientName}?`)) {
       return;
@@ -83,6 +101,8 @@ export default function AppointmentsTab() {
 
   const handleBookSubmit = async (e) => {
     e.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
     try {
       // Calculate start and end ISO
       const startIso = new Date(formData.startTime).toISOString();
@@ -115,6 +135,8 @@ export default function AppointmentsTab() {
         type: 'error',
         text: `Erro ao agendar: ${err.response?.data?.message || err.message}`,
       });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -179,30 +201,42 @@ export default function AppointmentsTab() {
           </div>
         </div>
 
-        {loadingSlots ? (
-          <div className="py-6 text-center text-xs text-slate-400">Consultando Google Calendar API...</div>
-        ) : slots.length === 0 ? (
-          <div className="py-6 text-center text-xs text-slate-500 bg-slate-950/40 rounded-xl">
-            Nenhum horário livre encontrado para esta data ou fora do expediente.
-          </div>
-        ) : (
-          <div className="flex flex-wrap gap-2 pt-2">
-            {slots.map((slot, idx) => {
-              const timeStr = new Date(slot).toLocaleTimeString('pt-BR', {
-                hour: '2-digit',
-                minute: '2-digit',
-              });
-              return (
-                <span
-                  key={idx}
-                  className="px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-mono font-medium hover:bg-emerald-500/20 transition-colors cursor-default"
-                >
-                  🕒 {timeStr}
-                </span>
-              );
-            })}
-          </div>
-        )}
+        {(() => {
+          const availableSlots = slots.filter((s) => (typeof s === 'object' && s !== null ? s.available !== false : true));
+          if (loadingSlots) {
+            return <div className="py-6 text-center text-xs text-slate-400">Consultando Google Calendar API...</div>;
+          }
+          if (availableSlots.length === 0) {
+            return (
+              <div className="py-6 text-center text-xs text-slate-500 bg-slate-950/40 rounded-xl">
+                Nenhum horário livre encontrado para esta data ou fora do expediente.
+              </div>
+            );
+          }
+          return (
+            <div className="flex flex-wrap gap-2 pt-2">
+              {availableSlots.map((slot, idx) => {
+                const rawDate = typeof slot === 'object' && slot !== null ? slot.startTime : slot;
+                const timeStr = new Date(rawDate).toLocaleTimeString('pt-BR', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                });
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleSlotClick(slot)}
+                    title="Clique para agendar neste horário"
+                    className="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 hover:border-emerald-500/50 rounded-lg text-xs font-mono font-medium transition-all transform hover:-translate-y-0.5 cursor-pointer shadow-sm active:scale-95 flex items-center gap-1.5"
+                  >
+                    <span>🕒</span>
+                    <span>{timeStr}</span>
+                  </button>
+                );
+              })}
+            </div>
+          );
+        })()}
       </div>
 
       {/* Registered Appointments Table */}
@@ -364,9 +398,14 @@ export default function AppointmentsTab() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold shadow"
+                  disabled={submitting}
+                  className={`px-4 py-2 text-white rounded-lg text-xs font-semibold shadow transition-all ${
+                    submitting
+                      ? 'bg-indigo-600/50 cursor-not-allowed'
+                      : 'bg-indigo-600 hover:bg-indigo-500'
+                  }`}
                 >
-                  Confirmar e Sincronizar Google
+                  {submitting ? 'Agendando...' : 'Confirmar e Sincronizar Google'}
                 </button>
               </div>
             </form>

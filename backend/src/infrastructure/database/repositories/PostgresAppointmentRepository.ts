@@ -79,29 +79,39 @@ export class PostgresAppointmentRepository implements IAppointmentRepository {
     }
   }
 
-  async findByTenantAndPhone(tenantId: string, clientPhone: string): Promise<Appointment[]> {
-    const list: Appointment[] = [];
-    for (const a of this.memoryAppointments.values()) {
-      if (a.tenantId === tenantId && a.clientPhone === clientPhone) {
-        list.push(a);
-      }
-    }
-    if (list.length > 0) return list;
+  async findByTenantAndPhone(tenantId: string, clientPhone?: string): Promise<Appointment[]> {
+    const trimmedPhone = (clientPhone || "").trim();
 
     try {
       const client = await pool.connect();
       try {
-        const res = await client.query(
-          "SELECT * FROM appointments WHERE tenant_id = $1 AND client_phone = $2 ORDER BY start_time ASC",
-          [tenantId, clientPhone]
-        );
-        return res.rows.map((r) => this.mapRow(r));
+        let query = "SELECT * FROM appointments WHERE tenant_id = $1";
+        const params: any[] = [tenantId];
+        if (trimmedPhone) {
+          query += " AND (client_phone = $2 OR client_phone ILIKE $3)";
+          params.push(trimmedPhone, `%${trimmedPhone}%`);
+        }
+        query += " ORDER BY start_time DESC";
+        const res = await client.query(query, params);
+        if (res.rows.length > 0) {
+          return res.rows.map((r) => this.mapRow(r));
+        }
       } finally {
         client.release();
       }
     } catch {
-      return list;
+      // Database connection error, fallback to in-memory
     }
+
+    const list: Appointment[] = [];
+    for (const a of this.memoryAppointments.values()) {
+      if (a.tenantId === tenantId) {
+        if (!trimmedPhone || a.clientPhone.includes(trimmedPhone)) {
+          list.push(a);
+        }
+      }
+    }
+    return list;
   }
 
   async update(appointment: Appointment): Promise<void> {
