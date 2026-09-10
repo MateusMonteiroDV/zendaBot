@@ -61,11 +61,26 @@ export class GeminiLlmProvider implements ILlmProvider {
       ];
     }
 
-    const response = await this.client.models.generateContent({
-      model: this.model,
-      contents,
-      config,
-    });
+    let response: any;
+    try {
+      response = await this.client.models.generateContent({
+        model: this.model,
+        contents,
+        config,
+      });
+    } catch (err: any) {
+      if (err?.message?.includes("503") || err?.message?.includes("high demand")) {
+        console.warn("[GeminiLlmProvider] High demand (503). Retrying in 1.5s...");
+        await new Promise((res) => setTimeout(res, 1500));
+        response = await this.client.models.generateContent({
+          model: this.model,
+          contents,
+          config,
+        });
+      } else {
+        throw err;
+      }
+    }
 
     const toolCalls: LlmToolCall[] = [];
     if (response.functionCalls && response.functionCalls.length > 0) {
