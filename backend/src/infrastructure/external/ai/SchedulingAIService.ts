@@ -48,20 +48,33 @@ export class SchedulingAIService implements IAIService {
     }
 
     const systemPrompt = `Você é a assistente virtual inteligente e acolhedora de agendamentos no WhatsApp da empresa "${context.businessName}".
-Data atual: ${context.currentDate}.
+Data e dia da semana atuais: ${context.currentDate}.
 Fuso horário: ${context.timeZone}.
 Telefone do cliente: ${context.clientPhone}.
-Nome do cliente: ${context.clientName || "Cliente"}.
 
 Suas atribuições:
 1. Consultar disponibilidade e horários livres diretamente no Google Agenda (use a ferramenta consultar_horarios_disponiveis).
-2. Agendar novas consultas/atendimentos no Google Agenda (use a ferramenta agendar_consulta). Para agendar, você precisa do nome do cliente, data (YYYY-MM-DD) e horário (HH:mm).
+2. Agendar novas consultas/atendimentos no Google Agenda (use a ferramenta agendar_consulta).
 3. Cancelar agendamentos existentes no Google Agenda (use a ferramenta cancelar_consulta).
 4. Listar consultas já marcadas para o cliente (use a ferramenta consultar_meus_agendamentos).
 
-Diretrizes:
-- Responda sempre em português brasileiro de forma educada, ágil, clara e com formatação agradável para WhatsApp (use quebras de linha e emojis).
-- Seja proativo: se o cliente perguntar de horários, consulte a agenda e apresente as opções disponíveis.
+Regras ESTRITAS para agendamento (MUITO IMPORTANTE):
+- Para agendar qualquer consulta, é OBRIGATÓRIO coletar duas informações essenciais do cliente:
+  1. Nome Completo do paciente/cliente;
+  2. CPF do paciente/cliente.
+- FLUXO DE AGENDAMENTO:
+  - Quando o cliente escolher ou solicitar uma data e horário (ex: "quero sábado às 14:00" ou "agenda amanhã às 10h"):
+    NUNCA execute a ferramenta 'agendar_consulta' imediatamente!
+    Em vez disso, responda educadamente reservando o horário e solicitando os dados:
+    "Excelente escolha! Para confirmarmos o seu agendamento no dia [Data] às [Horário], por favor me informe o seu *Nome Completo* e o seu *CPF*."
+  - Se o cliente informar apenas o nome, peça o CPF. Se informar apenas o CPF, peça o nome.
+  - SOMENTE execute a ferramenta 'agendar_consulta' quando você tiver o Nome Completo e o CPF fornecidos pelo cliente na conversa.
+  - Após agendar com sucesso, envie uma confirmação carinhosa contendo Nome, Data, Horário e CPF (ocultando os dígitos do meio para segurança, ex: 123.***.***-00).
+
+Diretrizes obrigatórias:
+- Responda sempre em português brasileiro de forma educada, ágil, simpática e com formatação agradável para WhatsApp (use quebras de linha e emojis).
+- Precisão de calendário: Use a data e dia da semana atuais fornecidos acima como referência absoluta. NUNCA confunda ou invente o dia da semana.
+- Ao informar horários disponíveis retornados pela ferramenta 'consultar_horarios_disponiveis', liste TODOS os horários disponíveis retornados, organizados de forma limpa em Manhã e Tarde. NUNCA invente bloqueios nem omita horários intermediários.
 - Confirme todos os detalhes com o cliente antes e após agendar ou cancelar.`;
 
     const tools: LlmToolDefinition[] = [
@@ -81,13 +94,17 @@ Diretrizes:
       },
       {
         name: "agendar_consulta",
-        description: "Agenda e confirma uma nova consulta diretamente no Google Agenda.",
+        description: "Agenda e confirma uma nova consulta no Google Agenda. Só chame esta função APÓS ter coletado o Nome Completo e o CPF do cliente.",
         parameters: {
           type: "object",
           properties: {
             nome_cliente: {
               type: "string",
-              description: "Nome completo do cliente",
+              description: "Nome completo informado pelo cliente",
+            },
+            cpf_cliente: {
+              type: "string",
+              description: "CPF informado pelo cliente",
             },
             data: {
               type: "string",
@@ -102,7 +119,7 @@ Diretrizes:
               description: "Tipo de consulta ou serviço desejado",
             },
           },
-          required: ["nome_cliente", "data", "horario"],
+          required: ["nome_cliente", "cpf_cliente", "data", "horario"],
         },
       },
       {
@@ -157,13 +174,36 @@ Diretrizes:
               tenantId: context.tenantId,
               date: args.data,
             });
+            const timeZone = context.timeZone || "America/Sao_Paulo";
             const available = slots
               .filter((s) => s.available)
-              .map((s) => s.startTime.split("T")[1]?.substring(0, 5) || s.startTime);
+              .map((s) => {
+                const d = new Date(s.startTime);
+                return d.toLocaleTimeString("pt-BR", {
+                  timeZone,
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                });
+              });
+
+            let diaSemana = "";
+            try {
+              const [y, m, d] = args.data.split("-").map(Number);
+              const dateObj = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+              diaSemana = new Intl.DateTimeFormat("pt-BR", {
+                timeZone,
+                weekday: "long",
+              }).format(dateObj);
+            } catch {
+              diaSemana = "";
+            }
+
             toolResult = {
               data: args.data,
+              dia_da_semana: diaSemana,
               horarios_disponiveis: available,
-              total: available.length,
+              total_horarios_livres: available.length,
             };
           } else if (fnName === "agendar_consulta" && this.bookAppointmentUseCase) {
             const appointment = await this.bookAppointmentUseCase.execute({
@@ -171,7 +211,8 @@ Diretrizes:
               clientName: args.nome_cliente || context.clientName || "Cliente",
               clientPhone: context.clientPhone,
               startTime: `${args.data}T${args.horario}:00`,
-              serviceName: args.servico,
+              serviceName: args.servico || "Consulta",
+              notes: args.cpf_cliente ? `CPF: ${args.cpf_cliente}` : undefined,
             });
             toolResult = {
               status: "confirmado",
@@ -222,7 +263,7 @@ Diretrizes:
       history.push({ role: "assistant", content: reply });
       return reply;
     } catch (err: any) {
-      console.warn(`[SchedulingAIService] Provedor ${this.llmProvider.providerName} indisponível ou erro: ${err.message}. Ativando fallback inteligente.`);
+      console.warn(`[SchedulingAIService] Provedor ${this.llmProvider.providerName} indisponível ou erro: ${err.message}`, err.cause || "");
       return await this.fallbackIntentHandler(userMessage, context);
     }
   }
@@ -275,12 +316,20 @@ Diretrizes:
     const timeMatch = lower.match(/(\d{1,2})[:h](\d{2})/) || lower.match(/às (\d{1,2})/);
 
     if ((lower.includes("agendar") || lower.includes("marcar") || lower.includes("quero")) && targetDate && timeMatch) {
-      if (this.bookAppointmentUseCase) {
-        const hour = timeMatch[1].padStart(2, "0");
-        const minute = timeMatch[2] || "00";
-        const startTime = `${targetDate}T${hour}:${minute}:00`;
-        const clientName = context.clientName || "Cliente";
+      const hour = timeMatch[1].padStart(2, "0");
+      const minute = timeMatch[2] || "00";
+      const startTime = `${targetDate}T${hour}:${minute}:00`;
 
+      // Verifica se CPF foi informado
+      const cpfMatch = message.match(/\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/) || message.match(/\b\d{11}\b/);
+      const nameMatch = message.match(/me chamo ([a-zA-ZÀ-ÿ\s]+)/i) || message.match(/nome:?\s*([a-zA-ZÀ-ÿ\s]+)/i);
+      const clientName = nameMatch ? nameMatch[1].trim() : (context.clientName && context.clientName !== "Cliente" ? context.clientName : "");
+
+      if (!cpfMatch || !clientName) {
+        return `Perfeito! Para confirmarmos o seu agendamento no dia *${targetDate} às ${hour}:${minute}*, por favor me informe o seu *Nome Completo* e o seu *CPF*. 😊`;
+      }
+
+      if (this.bookAppointmentUseCase) {
         try {
           await this.bookAppointmentUseCase.execute({
             tenantId: context.tenantId,
@@ -288,8 +337,10 @@ Diretrizes:
             clientPhone: context.clientPhone,
             startTime,
             serviceName: "Consulta",
+            notes: `CPF: ${cpfMatch[0]}`,
           });
-          return `✅ Agendamento confirmado com sucesso no Google Agenda para ${targetDate} às ${hour}:${minute}!`;
+          const maskedCpf = cpfMatch[0].replace(/(\d{3})\.?(\d{3})\.?(\d{3})-?(\d{2})/, "$1.***.***-$4");
+          return `✅ *Agendamento confirmado com sucesso no Google Agenda!* 🎉\n\n👤 *Paciente:* ${clientName}\n📄 *CPF:* ${maskedCpf}\n📅 *Data:* ${targetDate}\n⏰ *Horário:* ${hour}:${minute}\n\nSe precisar de mais alguma coisa, estamos à disposição!`;
         } catch (err: any) {
           return `Não foi possível agendar no Google Agenda: ${err.message}`;
         }
